@@ -58,13 +58,6 @@ becomes worth doing.
   branch, the app is available at the repo's Pages URL. Add that URL to your phone or
   tablet's home screen for an app-like icon and full-screen feel.
 
-## Updating
-
-To push a new version, replace `index.html` in this repo (Add file → Upload files, or
-edit in place) and commit. GitHub Pages redeploys automatically within a minute or so.
-Bump the version number and add a line to the changelog below so it's easy to tell at
-a glance whether the deployed copy is current.
-
 ## Changelog
 
 ### 1.1.0

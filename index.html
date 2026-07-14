@@ -67,6 +67,7 @@ input,select,textarea,button{font-family:inherit;color:var(--text,#26221b)}
     <div style="display:flex;align-items:baseline;gap:14px;flex-shrink:0">
       <h1 style="font-family:'Spectral',serif;font-weight:600;font-size:34px;margin:0;letter-spacing:-0.01em;white-space:nowrap;flex-shrink:0">Party Roster</h1>
       <span style="font-size:13px;color:var(--muted);letter-spacing:0.08em;text-transform:uppercase;white-space:nowrap">Daggerheart</span>
+      <span title="Build version — check the README changelog to see if a newer one is available" style="font-size:10.5px;color:var(--muted);background:var(--panel);border:1px solid var(--border2);border-radius:999px;padding:2px 8px;white-space:nowrap">{{appVersion}}</span>
     </div>
     <div style="position:relative;flex-shrink:0">
       <button sc-camel-on-click="{{toggleGameMenu}}" style="border:1px solid var(--border2);background:var(--panel);color:var(--text);border-radius:8px;padding:8px 14px;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:6px" style-hover="border-color:var(--text)">⚙ Options / {{activeGameName}} <span style="font-size:10px;color:var(--muted)">▾</span></button>
@@ -1643,8 +1644,13 @@ input,select,textarea,button{font-family:inherit;color:var(--text,#26221b)}
     if (onChangeRaw !== null) {
       var changeFn = resolveAttrRaw(scope, onChangeRaw);
       if (typeof changeFn === 'function') el.onchange = function (fn) { return function (e) { fn(e); }; }(changeFn);
-      // also fire on 'input' so text typing feels live, matching a controlled-input feel
-      if (typeof changeFn === 'function' && (realTag === 'input' || realTag === 'textarea')) {
+      // Mirror onto 'input' too, so typing feels live — but only for text-like
+      // fields. Checkboxes/radios already fire their own 'change', and also
+      // fire 'input' in modern browsers; wiring both would run a toggle
+      // handler twice per click and cancel itself out.
+      var textLikeTypes = { text: 1, number: 1, search: 1, email: 1, tel: 1, url: 1, password: 1, '': 1 };
+      var isTextLike = realTag === 'textarea' || (realTag === 'input' && textLikeTypes[(el.getAttribute('type') || '').toLowerCase()]);
+      if (typeof changeFn === 'function' && isTextLike) {
         el.oninput = el.onchange;
       }
     }
@@ -1732,6 +1738,7 @@ input,select,textarea,button{font-family:inherit;color:var(--text,#26221b)}
 
 </script>
 <script>
+const APP_VERSION = '1.1.0';
 
 class Component extends DCLogic {
   state = {
@@ -2063,6 +2070,26 @@ class Component extends DCLogic {
         click: () => set((i + 1 === marked) ? i : i + 1)
       });
     }
+    return arr;
+  }
+
+  // HP/Stress table rule: pips start full (all lit) and count down — the
+  // leftmost pips go dark first as damage/stress is marked, instead of
+  // filling up from empty. Click targeting stays the same as mkPips.
+  mkPipsCountdown(max, marked, onColor, set) {
+    const arr = [];
+    for (let i = 0; i < max; i++) {
+      arr.push({
+        bg: i < marked ? 'transparent' : onColor,
+        click: () => set((i + 1 === marked) ? i : i + 1)
+      });
+    }
+    return arr;
+  }
+
+  mkPipsReadonlyCountdown(max, marked, onColor) {
+    const arr = [];
+    for (let i = 0; i < max; i++) arr.push({ bg: i < marked ? 'transparent' : onColor });
     return arr;
   }
 
@@ -2659,6 +2686,7 @@ class Component extends DCLogic {
 
     const vals = {
       accent,
+      appVersion: (typeof APP_VERSION !== 'undefined' ? APP_VERSION : ''),
       pipRad: pipShape === 'diamond' ? '3px' : '999px',
       pipRot: pipShape === 'diamond' ? 'rotate(45deg)' : 'none',
       bg: theme.bg, panelBg: theme.panel, borderC: theme.border, border2C: theme.border2,
@@ -2762,7 +2790,7 @@ class Component extends DCLogic {
           difficulty: comp.difficulty,
           attack: (comp.attacks || []).map(a => a.name + (a.formula ? ' — ' + a.formula : '')).join(', ') || '—',
           stTxt: comp.stress.marked + ' / ' + comp.stress.max,
-          stPips: this.mkPipsReadonly(comp.stress.max, comp.stress.marked, '#5B4A8A'),
+          stPips: this.mkPipsReadonlyCountdown(comp.stress.max, comp.stress.marked, '#5B4A8A'),
           featuresTxt: (comp.features || []).map(f => f.name).join(', ') || '—',
           openOwner: () => this.setState({ screen: 'sheet', activeId: ch.id, tab: 'comp', dmgInput: '', useArmor: false }),
           confirmingDelete: s.compDeleteConfirmKey === (ch.id + ':' + i),
@@ -3128,8 +3156,8 @@ class Component extends DCLogic {
     vals.stTxt = c.stress.marked + ' / ' + c.stress.max + ' marked';
     vals.arTxt = c.armor.marked + ' / ' + c.armor.max + ' used';
     vals.hopeTxt = c.hope.marked + ' / ' + c.hope.max;
-    vals.hpPips = this.mkPips(c.hp.max, c.hp.marked, '#A33B3B', v => this.up(ch => ch.hp.marked = v));
-    vals.stPips = this.mkPips(c.stress.max, c.stress.marked, '#5B4A8A', v => this.up(ch => ch.stress.marked = v));
+    vals.hpPips = this.mkPipsCountdown(c.hp.max, c.hp.marked, '#A33B3B', v => this.up(ch => ch.hp.marked = v));
+    vals.stPips = this.mkPipsCountdown(c.stress.max, c.stress.marked, '#5B4A8A', v => this.up(ch => ch.stress.marked = v));
     vals.arPips = this.mkPips(c.armor.max, c.armor.marked, '#5A6470', v => this.up(ch => ch.armor.marked = v));
     vals.hopePips = this.mkPips(c.hope.max, c.hope.marked, '#C9A227', v => this.up(ch => ch.hope.marked = v));
 
@@ -3171,6 +3199,7 @@ class Component extends DCLogic {
     };
 
     vals.longRest = () => this.up(ch => {
+      ch.hp.marked = 0;
       ch.stress.marked = 0;
       ch.armor.marked = 0;
       ch.restItems.forEach(r => r.used = false);
@@ -3386,10 +3415,10 @@ class Component extends DCLogic {
         if (comp2.level % 2 === 0) comp2.stress.max += 1;
       });
       vals.compHpMarked = activeComp.hp.marked;
-      vals.compHpPips = this.mkPips(activeComp.hp.max, activeComp.hp.marked, '#A33B3B', v => this.up(ch => ch.companions[ch.activeCompanion].hp.marked = v));
+      vals.compHpPips = this.mkPipsCountdown(activeComp.hp.max, activeComp.hp.marked, '#A33B3B', v => this.up(ch => ch.companions[ch.activeCompanion].hp.marked = v));
       vals.compStTxt = activeComp.stress.marked + ' / ' + activeComp.stress.max;
       vals.compStMarked = activeComp.stress.marked;
-      vals.compStPips = this.mkPips(activeComp.stress.max, activeComp.stress.marked, '#5B4A8A', v => this.up(ch => ch.companions[ch.activeCompanion].stress.marked = v));
+      vals.compStPips = this.mkPipsCountdown(activeComp.stress.max, activeComp.stress.marked, '#5B4A8A', v => this.up(ch => ch.companions[ch.activeCompanion].stress.marked = v));
       const compIdx = c.activeCompanion;
       vals.compAttacks = activeComp.attacks.map((atk, i) => ({
         name: this.bind(cp + 'attacks.' + i + '.name'),

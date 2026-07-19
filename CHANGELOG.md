@@ -2,6 +2,11 @@
 
 All notable changes to the Daggerheart Tracker are logged here. Format loosely follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [1.3.4] — 2026-07-19
+
+### Fixed
+- **Duplicate-experience prevention.** Renaming an experience (or naming a new one) to match another experience already on the sheet — case-insensitive, whitespace-trimmed — is now blocked with an inline warning instead of silently allowed. The field snaps back to its previous value until the name is changed to something distinct.
+
 ## [1.3.3] — 2026-07-19
 
 ### Added

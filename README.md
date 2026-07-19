@@ -12,7 +12,7 @@
 A single-file, offline-friendly character tracker for Daggerheart — built to run anywhere
 a browser does, with no install, no server, and no account.
 
-**Current version:** `1.3.3` — also shown live in the app itself, top-left of the Party Roster
+**Current version:** `1.3.4` — also shown live in the app itself, top-left of the Party Roster
 screen. Compare that number to the [changelog](#changelog) below to see if the copy hosted
 on GitHub Pages is up to date. The app also checks for updates itself (see
 "Keeping deployed copies current" below) and will tell you directly if it's stale.
@@ -87,6 +87,15 @@ version string. If you forget to update `version.json`, nothing breaks; the bann
 just won't show up until it's fixed.
 
 ## Changelog
+[1.3.4] — 2026-07-19
+
+Fixed
+
+- Duplicate-experience prevention. Renaming an experience (or naming a new one) to
+  match another experience already on the sheet — case-insensitive, whitespace-trimmed —
+  is now blocked with an inline warning instead of silently allowed. The field snaps
+  back to its previous value until the name is changed to something distinct.
+
 [1.3.3] — 2026-07-19
 
 Added
@@ -170,7 +179,7 @@ Version bumped 1.1.0 → 1.2.0.
 
 ## KNOWN BUGS
 
-- Duplicate-experience prevention — still needs a decision on what exactly should de-duplicate (raised, not yet scoped).
+None currently tracked.
 
 ## Possible future work
 

@@ -2,6 +2,12 @@
 
 All notable changes to the Daggerheart Tracker are logged here. Format loosely follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [1.3.3] — 2026-07-19
+
+### Added
+- **Transformation forms (Void), first pass.** Any character can now opt into a Transformation tab (checkbox on the Edit tab) that works just like Druid Wildshape: a set of named forms with Tier/Evasion/Attack/Damage/Feature/Stress cost, one active at a time, transform/revert buttons.
+- Seeded with the six named Void transformations — Vampire, Werewolf, Reanimated, Shapeshifter, Ghost, Demigod — but their stats/features are placeholder text flagged "Void — pending official text," same convention as the other `voidPending` Void content. **These need to be replaced with the real card text from the Void source before they're used at the table** — the data model and UI are done, the content isn't.
+
 ## [1.3.2] — 2026-07-19
 
 ### Fixed

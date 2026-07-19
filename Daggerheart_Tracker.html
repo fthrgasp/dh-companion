@@ -955,6 +955,44 @@ CARD: ...</pre>
   </div>
   </sc-if>
 
+  <!-- ======== TRANSFORMATION TAB (Void) ======== -->
+  <sc-if value="{{tabTransformation}}" hint-placeholder-val="{{ false }}">
+  <div data-screen-label="Transformation" style="display:flex;flex-direction:column;gap:16px;max-width:820px">
+    <sc-if value="{{transformationActiveBanner}}" hint-placeholder-val="{{ false }}">
+      <div style="background:var(--highlight-bg);border:1px solid var(--accent,#8C5A2B);border-radius:12px;padding:14px 18px;display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+        <div style="flex:1"><div style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:2px">Currently transformed</div><div style="font-family:'Spectral',serif;font-size:20px;font-weight:600">{{transformationActiveName}}</div></div>
+        <button sc-camel-on-click="{{revertTransformation}}" style="border:none;background:var(--accent,#8C5A2B);color:#fff;border-radius:8px;padding:9px 18px;font-size:13.5px;font-weight:600;cursor:pointer">Revert to normal form</button>
+      </div>
+    </sc-if>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <sc-for list="{{transformationForms}}" as="tf" hint-placeholder-count="6">
+        <div style="background:var(--panel);border:1px solid {{tf.bc}};border-radius:12px;padding:16px 18px">
+          <sc-if value="{{tf.pendingBadge}}" hint-placeholder-val="{{ false }}">
+            <div style="display:inline-block;font-size:10px;letter-spacing:0.06em;text-transform:uppercase;color:#A33B3B;border:1px solid #A33B3B;border-radius:999px;padding:3px 8px;margin-bottom:10px">{{tf.pendingBadge}}</div>
+          </sc-if>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <div style="flex:2;min-width:160px"><div style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:4px">Form</div><input value="{{tf.name.val}}" sc-camel-on-change="{{tf.name.on}}" style="width:100%;box-sizing:border-box;border:1px solid var(--border2);border-radius:8px;padding:8px 10px;font-family:'Spectral',serif;font-size:15px;font-weight:600;background:var(--input-bg)"></div>
+            <div style="flex:none;width:70px"><div style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:4px">Tier</div><input type="number" value="{{tf.tier.val}}" sc-camel-on-change="{{tf.tier.on}}" style="width:100%;box-sizing:border-box;border:1px solid var(--border2);border-radius:8px;padding:8px 10px;font-size:14px;background:var(--input-bg)"></div>
+            <div style="flex:none;width:80px"><div style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:4px">Evasion</div><input type="number" value="{{tf.evasion.val}}" sc-camel-on-change="{{tf.evasion.on}}" style="width:100%;box-sizing:border-box;border:1px solid var(--border2);border-radius:8px;padding:8px 10px;font-size:14px;background:var(--input-bg)"></div>
+            <div style="flex:none;width:90px"><div style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:4px">Stress cost</div><input type="number" value="{{tf.stressCost.val}}" sc-camel-on-change="{{tf.stressCost.on}}" style="width:100%;box-sizing:border-box;border:1px solid var(--border2);border-radius:8px;padding:8px 10px;font-size:14px;background:var(--input-bg)"></div>
+          </div>
+          <div style="display:flex;gap:10px;margin-top:10px;flex-wrap:wrap">
+            <div style="flex:1;min-width:180px"><div style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:4px">Attack</div><input value="{{tf.attack.val}}" sc-camel-on-change="{{tf.attack.on}}" placeholder="e.g. Claws (Melee, Strength)" style="width:100%;box-sizing:border-box;border:1px solid var(--border2);border-radius:8px;padding:8px 10px;font-size:13.5px;background:var(--input-bg)"></div>
+            <div style="flex:none;width:120px"><div style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:4px">Damage</div><input value="{{tf.damage.val}}" sc-camel-on-change="{{tf.damage.on}}" style="width:100%;box-sizing:border-box;border:1px solid var(--border2);border-radius:8px;padding:8px 10px;font-size:13.5px;background:var(--input-bg)"></div>
+          </div>
+          <div style="margin-top:10px"><div style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:4px">Feature</div><input value="{{tf.feature.val}}" sc-camel-on-change="{{tf.feature.on}}" placeholder="What this form gains or can do" style="width:100%;box-sizing:border-box;border:1px solid var(--border2);border-radius:8px;padding:8px 10px;font-size:13.5px;background:var(--input-bg)"></div>
+          <div style="display:flex;align-items:center;gap:10px;margin-top:12px;border-top:1px solid var(--border3);padding-top:12px">
+            <button sc-camel-on-click="{{tf.transform}}" disabled="{{tf.isActive}}" style="border:none;background:{{tf.btnBg}};color:#fff;border-radius:8px;padding:8px 18px;font-size:13px;font-weight:600;cursor:pointer;opacity:{{tf.btnOpacity}}">{{tf.btnLabel}}</button>
+            <div style="flex:1"></div>
+            <button sc-camel-on-click="{{tf.remove}}" style="border:none;background:none;color:#b3ab9d;cursor:pointer;font-size:13px;padding:4px" style-hover="color:#A33B3B">Remove form</button>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+    <button sc-camel-on-click="{{addTransformationForm}}" style="align-self:flex-start;border:1px dashed var(--border2);background:none;color:var(--muted);border-radius:8px;padding:9px 16px;font-size:13px;cursor:pointer" style-hover="border-color:var(--accent,#8C5A2B);color:var(--accent,#8C5A2B)">+ Add transformation</button>
+  </div>
+  </sc-if>
+
   <!-- ======== BACKSTORY TAB ======== -->
   <sc-if value="{{tabBackstory}}" hint-placeholder-val="{{ false }}">
   <div data-screen-label="Backstory" style="display:flex;flex-direction:column;gap:16px;max-width:720px">
@@ -1171,6 +1209,7 @@ CARD: ...</pre>
         </div>
       </div>
       <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;padding-top:2px"><input type="checkbox" checked="{{isMulticlass}}" sc-camel-on-change="{{toggleMulticlass}}">Multiclass — take a second class</label>
+      <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;padding-top:2px"><input type="checkbox" checked="{{transformationEnabled}}" sc-camel-on-change="{{toggleTransformation}}">Has Transformation forms (Void) — adds a Transformation tab</label>
       <sc-if value="{{isMulticlass}}" hint-placeholder-val="{{ false }}">
         <div style="display:flex;gap:10px;flex-wrap:wrap;border-top:1px dashed var(--border2);padding-top:12px">
           <div style="flex:1;min-width:130px"><div style="font-size:11px;color:var(--muted);margin-bottom:4px">Second class</div><input value="{{ed.klass2.val}}" sc-camel-on-change="{{ed.klass2.on}}" style="width:100%;box-sizing:border-box;border:1px solid var(--border2);border-radius:8px;padding:8px 10px;font-size:14px;background:var(--input-bg)"></div>
@@ -1821,7 +1860,7 @@ CARD: ...</pre>
 
 </script>
 <script>
-const APP_VERSION = '1.3.2';
+const APP_VERSION = '1.3.3';
 
 class Component extends DCLogic {
   state = {
@@ -2546,6 +2585,26 @@ class Component extends DCLogic {
       active: null,
       forms: [
         { id: 'w' + Date.now(), name: 'New Beastform', tier: 1, evasion: 10, attack: '', damage: '', feature: '', stressCost: 0 }
+      ]
+    };
+  }
+
+  defaultTransformation() {
+    const stub = (name, id) => ({
+      id, name, tier: 1, evasion: 10, attack: '', damage: '',
+      feature: 'Void — pending: replace with the official Transformation card text.',
+      stressCost: 1, voidPending: true
+    });
+    return {
+      enabled: false,
+      active: null,
+      forms: [
+        stub('Vampire', 't-vampire'),
+        stub('Werewolf', 't-werewolf'),
+        stub('Reanimated', 't-reanimated'),
+        stub('Shapeshifter', 't-shapeshifter'),
+        stub('Ghost', 't-ghost'),
+        stub('Demigod', 't-demigod')
       ]
     };
   }
@@ -3291,6 +3350,7 @@ class Component extends DCLogic {
     if (c.activeCompanion == null) c.activeCompanion = 0;
     if (c.activeCompanion >= c.companions.length) c.activeCompanion = Math.max(0, c.companions.length - 1);
     if (!c.wildshape) c.wildshape = this.defaultWildshape();
+    if (!c.transformation) c.transformation = this.defaultTransformation();
 
     const isDruid = c.klass === 'Druid' || (c.multiclass && c.multiclass.klass === 'Druid');
     const isCompanionClass = c.klass === 'Ranger' || c.klass === 'Druid' || (c.multiclass && (c.multiclass.klass === 'Ranger' || c.multiclass.klass === 'Druid'));
@@ -3300,6 +3360,7 @@ class Component extends DCLogic {
       ['play', 'Play'], ['cards', 'Cards'], ['gear', 'Gear & Notes'],
       ['comp', 'Companion'],
       ...(isDruid ? [['wildshape', 'Wildshape']] : []),
+      ...(c.transformation.enabled ? [['transformation', 'Transformation']] : []),
       ['backstory', 'Backstory'],
       ['downtime', 'Downtime'], ['level', 'Level Up'], ['edit', 'Edit']
     ];
@@ -3325,6 +3386,7 @@ class Component extends DCLogic {
     vals.tabGear = s.tab === 'gear';
     vals.tabComp = s.tab === 'comp';
     vals.tabWildshape = s.tab === 'wildshape';
+    vals.tabTransformation = s.tab === 'transformation';
     vals.tabBackstory = s.tab === 'backstory';
     vals.backstoryVal = c.backstory || '';
     vals.hasBackstory = !!(c.backstory && c.backstory.trim());
@@ -3719,6 +3781,45 @@ class Component extends DCLogic {
     });
     vals.addWildshapeForm = () => this.up(ch => {
       ch.wildshape.forms.push({ id: 'w' + Date.now(), name: 'New Beastform', tier: 1, evasion: 10, attack: '', damage: '', feature: '', stressCost: 0 });
+    });
+
+    // ---- transformation tab (Void — Vampire/Werewolf/Reanimated/Shapeshifter/Ghost/Demigod) ----
+    vals.transformationEnabled = !!c.transformation.enabled;
+    vals.toggleTransformation = () => this.up(ch => { ch.transformation.enabled = !ch.transformation.enabled; });
+    vals.transformationActiveBanner = !!c.transformation.active;
+    const activeTransform = c.transformation.forms.find(f => f.id === c.transformation.active);
+    vals.transformationActiveName = activeTransform ? activeTransform.name : '';
+    vals.revertTransformation = () => this.up(ch => { ch.transformation.active = null; });
+    vals.transformationForms = c.transformation.forms.map((f, i) => {
+      const tp = 'transformation.forms.' + i + '.';
+      const isActive = c.transformation.active === f.id;
+      return {
+        isActive,
+        bc: isActive ? accent : theme.border,
+        btnLabel: isActive ? 'Transformed' : 'Transform',
+        btnBg: isActive ? theme.border2 : accent,
+        btnOpacity: isActive ? 0.6 : 1,
+        pendingBadge: f.voidPending ? 'Void — pending official text' : '',
+        name: this.bind(tp + 'name'),
+        tier: this.bind(tp + 'tier', true),
+        evasion: this.bind(tp + 'evasion', true),
+        stressCost: this.bind(tp + 'stressCost', true),
+        attack: this.bind(tp + 'attack'),
+        damage: this.bind(tp + 'damage'),
+        feature: this.bind(tp + 'feature'),
+        transform: () => this.up(ch => {
+          const form = ch.transformation.forms[i];
+          ch.transformation.active = form.id;
+          if (form.stressCost) ch.stress.marked = Math.min(ch.stress.max, ch.stress.marked + form.stressCost);
+        }),
+        remove: () => this.up(ch => {
+          if (ch.transformation.active === f.id) ch.transformation.active = null;
+          ch.transformation.forms.splice(i, 1);
+        })
+      };
+    });
+    vals.addTransformationForm = () => this.up(ch => {
+      ch.transformation.forms.push({ id: 't' + Date.now(), name: 'New Transformation', tier: 1, evasion: 10, attack: '', damage: '', feature: '', stressCost: 0 });
     });
 
     // ---- downtime tab ----

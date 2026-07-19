@@ -49,6 +49,14 @@ input,select,textarea,button{font-family:inherit;color:var(--text,#26221b)}
 
 <div style="min-height:100vh;background:{{wrapperBg}};color:var(--text);--accent:{{accent}};--prad:{{pipRad}};--prot:{{pipRot}};--bg:{{bg}};--panel:{{panelBg}};--border:{{borderC}};--border2:{{border2C}};--text:{{textC}};--muted:{{mutedC}};--input-bg:{{inputBg}};--border3:{{border3C}};--track-bg:{{trackBg}};--companion-bg:{{companionBgC}};--companion-border:{{companionBorderC}};--major-bg:{{majorBgC}};--severe-bg:{{severeBgC}};--highlight-bg:{{highlightBgC}}">
 
+<sc-if value="{{updateAvailable}}" hint-placeholder-val="{{ false }}">
+  <div data-print-hide="1" style="position:sticky;top:0;z-index:100;background:var(--accent,#8C5A2B);color:#fff;padding:9px 16px;display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap;font-size:13px">
+    <span>A newer version ({{updateVersion}}) is available. Your saved characters are safe either way.</span>
+    <button sc-camel-on-click="{{reloadForUpdate}}" style="border:1px solid rgba(255,255,255,0.6);background:rgba(255,255,255,0.15);color:#fff;border-radius:8px;padding:5px 14px;font-size:12.5px;cursor:pointer">Reload now</button>
+    <button sc-camel-on-click="{{dismissUpdate}}" style="border:none;background:none;color:#fff;opacity:0.8;cursor:pointer;font-size:12.5px;text-decoration:underline">Not now</button>
+  </div>
+</sc-if>
+
 <!-- ============ ROSTER ============ -->
 <sc-if value="{{isRoster}}" hint-placeholder-val="{{ true }}">
 <div data-screen-label="Party Roster" style="max-width:1180px;margin:0 auto;padding:48px 32px;position:relative;z-index:0">
@@ -502,7 +510,7 @@ input,select,textarea,button{font-family:inherit;color:var(--text,#26221b)}
         </div>
       </div>
 
-      <button sc-camel-on-click="{{longRest}}" data-print-hide="1" style="border:1px solid var(--border2);background:var(--panel);border-radius:10px;padding:13px;font-size:14px;cursor:pointer;color:var(--text)" style-hover="border-color:var(--accent,#8C5A2B);color:var(--accent,#8C5A2B)">☽ Long rest — clear Stress, restore armor slots &amp; once-per-rest items</button>
+      <button sc-camel-on-click="{{longRest}}" data-print-hide="1" style="border:1px solid var(--border2);background:var(--panel);border-radius:10px;padding:13px;font-size:14px;cursor:pointer;color:var(--text)" style-hover="border-color:var(--accent,#8C5A2B);color:var(--accent,#8C5A2B)">☽ Long rest — clear HP &amp; Stress, restore armor slots &amp; once-per-rest items</button>
     </div>
 
     <!-- Column C: trackers + items -->
@@ -1801,7 +1809,7 @@ CARD: ...</pre>
 
 </script>
 <script>
-const APP_VERSION = '1.3.0';
+const APP_VERSION = '1.3.1';
 
 class Component extends DCLogic {
   state = {
@@ -1817,6 +1825,7 @@ class Component extends DCLogic {
     newConditionName: '', confirmDelete: false, rosterDeleteConfirmId: null, compDeleteConfirmKey: null, undo: null, wizard: null, bannerMode: 'none',
     customClasses: [], newClassName: '', newClassDesc: '',
     sessionElapsed: 0, sessionRunning: false,
+    updateAvailable: false, updateVersion: '',
     games: [{ id: 'default', name: 'My Campaign' }], activeGame: 'default', newGameName: '', gameMenuOpen: false,
     editingGameId: null, renameGameVal: '',
     creatures: [], newCreatureName: ''
@@ -2860,6 +2869,10 @@ class Component extends DCLogic {
     const vals = {
       accent,
       appVersion: (typeof APP_VERSION !== 'undefined' ? APP_VERSION : ''),
+      updateAvailable: !!s.updateAvailable,
+      updateVersion: s.updateVersion,
+      reloadForUpdate: () => { location.href = location.pathname + '?_=' + Date.now(); },
+      dismissUpdate: () => this.setState({ updateAvailable: false }),
       pipRad: pipShape === 'diamond' ? '3px' : '999px',
       pipRot: pipShape === 'diamond' ? 'rotate(45deg)' : 'none',
       bg: theme.bg, panelBg: theme.panel, borderC: theme.border, border2C: theme.border2,
@@ -3835,6 +3848,24 @@ class Component extends DCLogic {
   }
 }
 
+// Checks version.json (same folder as this file) with the browser cache
+// bypassed entirely, so an iPad/iPhone home-screen icon — which is prone to
+// holding onto a stale copy far longer than a normal browser tab would —
+// still notices a new deploy. Never touches localStorage/character data;
+// this only decides whether to show the "update available" banner.
+function checkForUpdate() {
+  var inst = window.__dcEngine && window.__dcEngine.instance;
+  if (!inst || typeof APP_VERSION === 'undefined') return;
+  fetch('version.json?_=' + Date.now(), { cache: 'no-store' })
+    .then(function (r) { return r.ok ? r.json() : null; })
+    .then(function (data) {
+      if (data && data.version && data.version !== APP_VERSION) {
+        inst.setState({ updateAvailable: true, updateVersion: data.version });
+      }
+    })
+    .catch(function () { /* offline or version.json missing — fail silently */ });
+}
+
 window.addEventListener('DOMContentLoaded', function () {
   var tpl = document.getElementById('app-template').innerHTML;
   var root = document.getElementById('app-root');
@@ -3844,7 +3875,17 @@ window.addEventListener('DOMContentLoaded', function () {
   if (typeof engine.instance.componentDidMount === 'function') {
     engine.instance.componentDidMount();
   }
+  checkForUpdate();
 });
+
+// Re-check whenever the app comes back to the foreground — covers both a
+// backgrounded browser tab and a home-screen web-clip being reopened, which
+// is the case that doesn't naturally trigger a fresh network request.
+document.addEventListener('visibilitychange', function () {
+  if (document.visibilityState === 'visible') checkForUpdate();
+});
+window.addEventListener('pageshow', function () { checkForUpdate(); });
+
 </script>
 </body>
 </html>

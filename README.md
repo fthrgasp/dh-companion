@@ -12,9 +12,10 @@
 A single-file, offline-friendly character tracker for Daggerheart — built to run anywhere
 a browser does, with no install, no server, and no account.
 
-**Current version:** `1.3.0` — also shown live in the app itself, top-left of the Party Roster
+**Current version:** `1.3.1` — also shown live in the app itself, top-left of the Party Roster
 screen. Compare that number to the [changelog](#changelog) below to see if the copy hosted
-on GitHub Pages is up to date.
+on GitHub Pages is up to date. The app also checks for updates itself (see
+"Keeping deployed copies current" below) and will tell you directly if it's stale.
 
 ## What it does
 
@@ -66,6 +67,24 @@ becomes worth doing.
   [GitHub Pages](https://pages.github.com/). Once Pages is enabled on the `main`
   branch, the app is available at the repo's Pages URL. Add that URL to your phone or
   tablet's home screen for an app-like icon and full-screen feel.
+
+## Keeping deployed copies current
+
+Home-screen icons on iOS/iPadOS (and long-lived browser tabs in general) can hold
+onto a stale, already-loaded copy of the app well past when a fresh visit would pick
+up changes — there's no reload button on a home-screen icon to force it manually.
+
+To fix that, the app polls a small `version.json` file (same folder as `index.html`)
+with the browser cache forced off, both on load and whenever it comes back to the
+foreground. If the deployed version doesn't match what's currently running, a banner
+offers a one-tap reload — character data is in `localStorage`, not in whatever got
+cached, so this never touches anyone's saves.
+
+**When you bump `APP_VERSION` in `index.html`, bump the version number in
+`version.json` to match.** They're two separate files on purpose — checking a few
+bytes of JSON is a lot cheaper than re-fetching the whole app just to compare a
+version string. If you forget to update `version.json`, nothing breaks; the banner
+just won't show up until it's fixed.
 
 ## Changelog
 [1.3.0] — 2026-07-18

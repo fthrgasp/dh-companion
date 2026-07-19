@@ -2,6 +2,23 @@
 
 All notable changes to the Daggerheart Tracker are logged here. Format loosely follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [1.3.1] — 2026-07-18
+
+### Added
+- **"Update available" banner.** A `version.json` file now ships alongside `index.html`.
+  The app checks it — with the browser cache forced off — on load *and* whenever the
+  app comes back to the foreground, which is the part that actually matters for a
+  home-screen icon on an iPad/iPhone: those are notorious for holding onto a stale
+  copy well past when a normal browser tab would refresh. If the deployed version
+  doesn't match what's running, a small banner offers a one-tap reload. Character
+  data lives in localStorage, not in this cache, so reloading never touches it.
+
+### Deploying an update from here on
+Whenever `index.html`'s `APP_VERSION` gets bumped, **`version.json` needs the same
+bump** — it's a separate file on purpose (checking it is a much smaller request than
+re-fetching the whole app just to compare a version string). Forgetting to update it
+just means the banner won't show up; nothing breaks, it just goes quiet.
+
 ## [1.3.0] — 2026-07-18
 
 ### Added

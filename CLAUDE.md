@@ -8,7 +8,7 @@ see current state" is the accepted UX for shared data.
 
 This is a passion project. Prioritize clean, maintainable solutions over speed-hacks.
 
-## Current architecture (v1.3.0, as of last full audit)
+## Current architecture (v0.9.0, as of last full audit)
 
 **Not React.** A homegrown ~250-line template engine (`DcEngine`) baked into the
 single HTML file:

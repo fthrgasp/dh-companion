@@ -12,7 +12,7 @@
 A single-file, offline-friendly character tracker for Daggerheart — built to run anywhere
 a browser does, with no install, no server, and no account.
 
-**Current version:** `1.3.5` — also shown live in the app itself, top-left of the Party Roster
+**Current version:** `0.9.0` — also shown live in the app itself, top-left of the Party Roster
 screen. Compare that number to the [changelog](#changelog) below to see if the copy hosted
 on GitHub Pages is up to date. The app also checks for updates itself (see
 "Keeping deployed copies current" below) and will tell you directly if it's stale.
@@ -87,7 +87,7 @@ version string. If you forget to update `version.json`, nothing breaks; the bann
 just won't show up until it's fixed.
 
 ## Changelog
-[1.3.5] — 2026-07-19
+[0.9.0] — 2026-07-19
 
 Added
 
@@ -98,7 +98,7 @@ Added
   Damage is left blank on purpose (no guessed numbers); armor score defaults to 3.
   Replace with the real class item from the Void PDF before play.
 
-[1.3.4] — 2026-07-19
+[0.8.0] — 2026-07-19
 
 Fixed
 
@@ -107,7 +107,7 @@ Fixed
   is now blocked with an inline warning instead of silently allowed. The field snaps
   back to its previous value until the name is changed to something distinct.
 
-[1.3.3] — 2026-07-19
+[0.7.0] — 2026-07-19
 
 Added
 
@@ -119,7 +119,7 @@ Added
   pending official text" until someone replaces them with the real card text from the
   Void source. Data model and UI are done; the content isn't.
 
-[1.3.2] — 2026-07-19
+[0.6.0] — 2026-07-19
 
 Fixed
 
@@ -131,7 +131,7 @@ Fixed
   it on a level where Proficiency just auto-increased now prompts a confirmation, since
   that stacks an extra point on top of the automatic one.
 
-[1.3.0] — 2026-07-18
+[0.4.0] — 2026-07-18
 
 Added
 
@@ -146,7 +146,7 @@ Added
   picker, and the auto-fill when padding out a higher-level starting character.
 
 
-[1.2.0] — 2026-07-18
+[0.3.0] — 2026-07-18
 
 Added
 
@@ -172,9 +172,9 @@ Changed
   directly from the app's real data instead of a separately hardcoded list, so new 
   built-in content can't silently fall out of sync going forward.
 
-Version bumped 1.1.0 → 1.2.0.
+Version bumped 0.2.0 → 0.3.0.
 
-### 1.1.0
+### 0.2.0
 - Added an in-app version badge (Party Roster header) so you can tell what's deployed
 - Fixed: checkboxes throughout the Gear & Notes tab (including weapon **Equipped**
   toggles) weren't registering clicks
@@ -183,7 +183,7 @@ Version bumped 1.1.0 → 1.2.0.
 - Fixed: Long Rest now also resets Hit Points (Stress and Armor marks were already
   being cleared)
 
-### 1.0.0
+### 0.1.0
 - Initial standalone rebuild — ported from the Claude.ai artifact export into a
   dependency-free HTML file that runs in any browser, including as a local file with
   no server
@@ -204,11 +204,11 @@ None currently tracked.
 
 - Void class stats are estimates, not confirmed. Evasion/HP for the 6 new classes are placeholders
   (flagged voidPending in code) until checked against the official PDFs — don't take them as gospel yet.
-  Class items/weapons now preselect an obvious "pending (Void)" placeholder (1.3.5) instead of the
+  Class items/weapons now preselect an obvious "pending (Void)" placeholder (0.9.0) instead of the
   generic picker, but still need the real class item swapped in from the Void PDF.
 
 - Transformation cards (Vampire, Werewolf, Reanimated, Shapeshifter, Ghost, Demigod) — data
-  model and UI shipped in 1.3.3 (opt-in Transformation tab, same pattern as Wildshape), but
+  model and UI shipped in 0.7.0 (opt-in Transformation tab, same pattern as Wildshape), but
   the six forms are still placeholder stats/text flagged "Void — pending official text."
   Someone needs to pull the real card text from the Void source and fill them in.
 

@@ -12,7 +12,7 @@
 A single-file, offline-friendly character tracker for Daggerheart — built to run anywhere
 a browser does, with no install, no server, and no account.
 
-**Current version:** `1.3.4` — also shown live in the app itself, top-left of the Party Roster
+**Current version:** `1.3.5` — also shown live in the app itself, top-left of the Party Roster
 screen. Compare that number to the [changelog](#changelog) below to see if the copy hosted
 on GitHub Pages is up to date. The app also checks for updates itself (see
 "Keeping deployed copies current" below) and will tell you directly if it's stale.
@@ -87,6 +87,17 @@ version string. If you forget to update `version.json`, nothing breaks; the bann
 just won't show up until it's fixed.
 
 ## Changelog
+[1.3.5] — 2026-07-19
+
+Added
+
+- Placeholder starting weapon/armor for the six Void classes. Assassin, Witch,
+  Warlock, Brawler, Blood Hunter, and Summoner now preselect an obviously-fake
+  "Class item — pending (Void)" / "Armor — pending (Void)" entry in the creation
+  wizard instead of silently falling back to the generic weapon/armor picker.
+  Damage is left blank on purpose (no guessed numbers); armor score defaults to 3.
+  Replace with the real class item from the Void PDF before play.
+
 [1.3.4] — 2026-07-19
 
 Fixed
@@ -193,8 +204,8 @@ None currently tracked.
 
 - Void class stats are estimates, not confirmed. Evasion/HP for the 6 new classes are placeholders
   (flagged voidPending in code) until checked against the official PDFs — don't take them as gospel yet.
-  Void class items/weapons not set. Those classes currently fall back to the generic weapon/armor picker 
-  rather than their real class item.
+  Class items/weapons now preselect an obvious "pending (Void)" placeholder (1.3.5) instead of the
+  generic picker, but still need the real class item swapped in from the Void PDF.
 
 - Transformation cards (Vampire, Werewolf, Reanimated, Shapeshifter, Ghost, Demigod) — data
   model and UI shipped in 1.3.3 (opt-in Transformation tab, same pattern as Wildshape), but

@@ -1865,7 +1865,7 @@ CARD: ...</pre>
 
 </script>
 <script>
-const APP_VERSION = '1.3.4';
+const APP_VERSION = '1.3.5';
 
 class Component extends DCLogic {
   state = {
@@ -2695,15 +2695,28 @@ class Component extends DCLogic {
       // --- The Void (playtest classes, current as of the 2026-07-09 update) ---
       // Domains and subclass names below are confirmed against daggerheart.com/thevoid.
       // evasion/hp are flagged VOID-EST where not independently confirmed — cross-check
-      // against your Void PDF and correct here before play. Weapons/armors are left
-      // out on purpose where the class item isn't confirmed; the wizard already falls
-      // back to the generic weapon/armor presets rather than getting a wrong item.
-      Assassin: { domains: ['Blade', 'Midnight'], subclasses: ['Executioners Guild', 'Poisoners Guild'], evasion: 12, hp: 6, voidPending: true },
-      Witch: { domains: ['Dread', 'Sage'], subclasses: ['Hedge', 'Moon'], evasion: 10, hp: 6, voidPending: true },
-      Warlock: { domains: ['Dread', 'Grace'], subclasses: ['Pact of the Endless', 'Pact of the Wrathful'], evasion: 10, hp: 6, voidPending: true },
-      Brawler: { domains: ['Bone', 'Valor'], subclasses: ['Juggernaut', 'Martial Artist'], evasion: 10, hp: 7, voidPending: true },
-      'Blood Hunter': { domains: ['Blood', 'Bone'], subclasses: ['Order of the Lycan', 'Order of the Mutant', 'Order of the Specter'], evasion: 10, hp: 6, voidPending: true },
-      Summoner: { domains: ['Blood', 'Splendor'], subclasses: ['Necromancy', 'Theurgy'], evasion: 10, hp: 6, voidPending: true }
+      // against your Void PDF and correct here before play. weapons/armors below are
+      // placeholder stand-ins (obviously-fake names, no real damage/score guessed) so
+      // the wizard has a class item to preselect instead of falling to the generic
+      // picker — replace with the real class item from the Void PDF before play.
+      Assassin: { domains: ['Blade', 'Midnight'], subclasses: ['Executioners Guild', 'Poisoners Guild'], evasion: 12, hp: 6, voidPending: true,
+        weapons: [{ id: 'assassin-pending', name: 'Class item — pending (Void)', range: 'Melee', damage: '' }],
+        armors: [{ id: 'assassin-armor-pending', name: 'Armor — pending (Void)', score: 3 }] },
+      Witch: { domains: ['Dread', 'Sage'], subclasses: ['Hedge', 'Moon'], evasion: 10, hp: 6, voidPending: true,
+        weapons: [{ id: 'witch-pending', name: 'Class item — pending (Void)', range: 'Melee', damage: '' }],
+        armors: [{ id: 'witch-armor-pending', name: 'Armor — pending (Void)', score: 3 }] },
+      Warlock: { domains: ['Dread', 'Grace'], subclasses: ['Pact of the Endless', 'Pact of the Wrathful'], evasion: 10, hp: 6, voidPending: true,
+        weapons: [{ id: 'warlock-pending', name: 'Class item — pending (Void)', range: 'Melee', damage: '' }],
+        armors: [{ id: 'warlock-armor-pending', name: 'Armor — pending (Void)', score: 3 }] },
+      Brawler: { domains: ['Bone', 'Valor'], subclasses: ['Juggernaut', 'Martial Artist'], evasion: 10, hp: 7, voidPending: true,
+        weapons: [{ id: 'brawler-pending', name: 'Class item — pending (Void)', range: 'Melee', damage: '' }],
+        armors: [{ id: 'brawler-armor-pending', name: 'Armor — pending (Void)', score: 3 }] },
+      'Blood Hunter': { domains: ['Blood', 'Bone'], subclasses: ['Order of the Lycan', 'Order of the Mutant', 'Order of the Specter'], evasion: 10, hp: 6, voidPending: true,
+        weapons: [{ id: 'bloodhunter-pending', name: 'Class item — pending (Void)', range: 'Melee', damage: '' }],
+        armors: [{ id: 'bloodhunter-armor-pending', name: 'Armor — pending (Void)', score: 3 }] },
+      Summoner: { domains: ['Blood', 'Splendor'], subclasses: ['Necromancy', 'Theurgy'], evasion: 10, hp: 6, voidPending: true,
+        weapons: [{ id: 'summoner-pending', name: 'Class item — pending (Void)', range: 'Melee', damage: '' }],
+        armors: [{ id: 'summoner-armor-pending', name: 'Armor — pending (Void)', score: 3 }] }
     };
   }
 

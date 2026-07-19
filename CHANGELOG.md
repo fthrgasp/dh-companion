@@ -2,6 +2,11 @@
 
 All notable changes to the Daggerheart Tracker are logged here. Format loosely follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [1.3.5] — 2026-07-19
+
+### Added
+- **Placeholder starting weapon/armor for the six Void classes.** Assassin, Witch, Warlock, Brawler, Blood Hunter, and Summoner now preselect an obviously-fake "Class item — pending (Void)" / "Armor — pending (Void)" entry in the creation wizard instead of silently falling back to the generic weapon/armor picker. Damage is left blank on purpose (no guessed numbers); armor score defaults to 3. Replace with the real class item from the Void PDF before play.
+
 ## [1.3.4] — 2026-07-19
 
 ### Fixed

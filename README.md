@@ -1,5 +1,14 @@
 # Daggerheart Character Companion
 
+> ⚠️ **This is a fan-made, unofficial tool.** It is not produced, reviewed, or
+> endorsed by Darrington Press or Critical Role. Everything mechanical in here
+> comes from Daggerheart, which they made and own — we just built a tracker
+> around it for our own table. If something's wrong, that's on us, not them.
+> Use of Playtest Materials from The Void is exactly that — playtest, unfinished,
+> subject to change without notice. No warranty express or implied, and no
+> guarantee this app won't curse your bloodline for nine generations if you
+> mismark a domain card. Play at your own risk.
+
 A single-file, offline-friendly character tracker for Daggerheart — built to run anywhere
 a browser does, with no install, no server, and no account.
 
@@ -141,4 +150,33 @@ Version bumped 1.1.0 → 1.2.0.
 
 - Void adversaries/environments — no code changes needed; add them through the existing Creatures 
   screen like any other bestiary entry.
+
+## Attribution & License
+
+Daggerheart Compatible.
+
+This project uses game content from **Daggerheart**, published by Darrington Press,
+under the [Darrington Press Community Gaming License](https://darringtonpress.com/license/)
+(DPCGL):
+
+- Core classes, domains, ancestries, and communities are drawn from the **Daggerheart
+  System Reference Document (SRD) 1.0**.
+- Assassin, Witch, Warlock, Brawler, Blood Hunter, and Summoner (plus the Blood and
+  Dread domains and the six newer ancestries/communities) are **Playtest Materials**
+  from [The Void](https://www.daggerheart.com/thevoid/), also covered under the DPCGL.
+  Void content is explicitly unfinished and gets revised by Darrington Press on an
+  ongoing basis — what's implemented here may lag behind the current live version.
+
+> This product includes materials from the Daggerheart System Reference Document 1.0,
+> © Critical Role, LLC, under the terms of the Darrington Press Community Gaming
+> License. More information at [www.daggerheart.com](https://www.daggerheart.com).
+
+**Daggerheart™** and **Darrington Press™** are trademarks of Critical Role, LLC. This
+project is an unofficial fan creation and is not affiliated with, sponsored by, or
+endorsed by Darrington Press or Critical Role.
+
+This is a personal, non-commercial tool built for one home table. It isn't for sale
+and isn't distributed as a product — per the DPCGL, Playtest Materials specifically
+can't be sold or monetized in any form, and we're not doing that here.
+
   

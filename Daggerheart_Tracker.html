@@ -178,6 +178,11 @@ input,select,textarea,button{font-family:inherit;color:var(--text,#26221b)}
       <div style="font-size:22px;line-height:1">✨</div>
       <div style="font-size:12.5px;letter-spacing:0.08em;text-transform:uppercase">Guided creation</div>
     </div>
+    <label style="border:2px dashed var(--border2);border-radius:12px;min-height:140px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;cursor:pointer;color:var(--muted);margin:0" style-hover="border-color:var(--accent,#8C5A2B);color:var(--accent,#8C5A2B)">
+      <div style="font-size:22px;line-height:1">⇧</div>
+      <div style="font-size:12.5px;letter-spacing:0.08em;text-transform:uppercase">Import character</div>
+      <input type="file" accept="application/json,.json" sc-camel-on-change="{{importFileChange}}" style="display:none">
+    </label>
   </div>
 </div>
 </sc-if>
@@ -389,7 +394,15 @@ input,select,textarea,button{font-family:inherit;color:var(--text,#26221b)}
         <button sc-camel-on-click="{{sessionToggle}}" style="width:28px;height:28px;border:none;background:var(--highlight-bg);color:var(--text);border-radius:6px;cursor:pointer;font-size:12px">{{sessionToggleLabel}}</button>
         <button sc-camel-on-click="{{sessionReset}}" style="width:28px;height:28px;border:none;background:none;color:var(--muted);cursor:pointer;font-size:13px" style-hover="color:#A33B3B">↻</button>
       </div>
-      <button sc-camel-on-click="{{exportPdf}}" data-print-hide="1" style="border:1px solid var(--border2);background:var(--panel);color:var(--text);border-radius:8px;padding:8px 14px;font-size:13px;cursor:pointer" style-hover="border-color:var(--text)">⇩ Export PDF</button>
+      <div style="position:relative" data-print-hide="1">
+        <button sc-camel-on-click="{{toggleExportMenu}}" title="Export" style="border:1px solid var(--border2);background:var(--panel);color:var(--text);border-radius:8px;padding:8px 12px;font-size:13px;cursor:pointer" style-hover="border-color:var(--text)">⋯</button>
+        <sc-if value="{{exportMenuOpen}}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;top:calc(100% + 6px);right:0;z-index:50;min-width:180px;background:var(--panel);border:1px solid var(--border2);border-radius:10px;box-shadow:0 8px 24px rgba(38,34,27,0.14);padding:6px;display:flex;flex-direction:column;gap:2px">
+            <button sc-camel-on-click="{{exportPdf}}" style="border:none;background:none;text-align:left;border-radius:7px;padding:9px 12px;font-size:13.5px;cursor:pointer" style-hover="background:var(--highlight-bg)">⇩ Export PDF</button>
+            <button sc-camel-on-click="{{exportJson}}" style="border:none;background:none;text-align:left;border-radius:7px;padding:9px 12px;font-size:13.5px;cursor:pointer" style-hover="background:var(--highlight-bg)">⇩ Export JSON</button>
+          </div>
+        </sc-if>
+      </div>
       <button sc-camel-on-click="{{toggleDark}}" data-print-hide="1" style="border:1px solid var(--border2);background:var(--panel);color:var(--text);border-radius:8px;padding:8px 14px;font-size:13px;cursor:pointer" style-hover="border-color:var(--text)">{{darkLabel}}</button>
       <div style="text-align:center;background:var(--accent,#8C5A2B);color:#fff;border-radius:10px;padding:6px 14px"><div style="font-size:9.5px;letter-spacing:0.1em;text-transform:uppercase;opacity:0.8">Level</div><div style="font-family:'Spectral',serif;font-size:20px;font-weight:600;line-height:1">{{c.level}}</div></div>
     </div>
@@ -1304,6 +1317,33 @@ CARD: ...</pre>
     <button sc-camel-on-click="{{undoDismiss}}" style="border:none;background:none;color:var(--bg);opacity:0.6;cursor:pointer;font-size:14px;padding:2px">✕</button>
   </div>
 </sc-if>
+<sc-if value="{{importErrorOpen}}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:#A33B3B;color:#fff;border-radius:10px;padding:12px 14px 12px 18px;display:flex;align-items:center;gap:14px;box-shadow:0 12px 30px rgba(0,0,0,0.25);z-index:200;font-size:13.5px;max-width:90vw">
+    <span>{{importErrorText}}</span>
+    <button sc-camel-on-click="{{dismissImportError}}" style="border:none;background:none;color:#fff;opacity:0.8;cursor:pointer;font-size:14px;padding:2px">✕</button>
+  </div>
+</sc-if>
+<sc-if value="{{importConflictOpen}}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed;inset:0;background:rgba(20,18,14,0.45);display:flex;align-items:center;justify-content:center;z-index:250;padding:20px">
+    <div style="background:var(--panel);border-radius:16px;width:100%;max-width:480px;max-height:86vh;overflow:auto;padding:26px 28px;box-shadow:0 20px 50px rgba(0,0,0,0.25)">
+      <div style="font-family:'Spectral',serif;font-size:19px;font-weight:600;margin-bottom:8px">A character named "{{importConflictName}}" already exists</div>
+      <p style="font-size:13.5px;color:var(--muted);margin:0 0 16px;line-height:1.5">Cancel to back out, import as a separate new character, or merge the imported fields into the existing one.</p>
+      <sc-if value="{{importMergeDiffHasLines}}" hint-placeholder-val="{{ false }}">
+        <div style="border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:16px;display:flex;flex-direction:column;gap:4px">
+          <div style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:4px">If merged, these fields would change</div>
+          <sc-for list="{{importMergeDiffLines}}" as="dl" hint-placeholder-count="3">
+            <div style="font-size:13px">{{dl.text}}</div>
+          </sc-for>
+        </div>
+      </sc-if>
+      <div style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap">
+        <button sc-camel-on-click="{{importCancelConflict}}" style="border:1px solid var(--border2);background:var(--panel);color:var(--text);border-radius:8px;padding:9px 16px;font-size:13.5px;cursor:pointer">Cancel</button>
+        <button sc-camel-on-click="{{importAsNew}}" style="border:1px solid var(--border2);background:var(--panel);color:var(--text);border-radius:8px;padding:9px 16px;font-size:13.5px;cursor:pointer">Import as new</button>
+        <button sc-camel-on-click="{{importMerge}}" style="border:none;background:var(--accent,#8C5A2B);color:#fff;border-radius:8px;padding:9px 18px;font-size:13.5px;font-weight:600;cursor:pointer">Merge</button>
+      </div>
+    </div>
+  </div>
+</sc-if>
 
 <!-- ============ CHARACTER CREATION WIZARD ============ -->
 <sc-if value="{{wizardOpen}}" hint-placeholder-val="{{ false }}">
@@ -1865,7 +1905,7 @@ CARD: ...</pre>
 
 </script>
 <script>
-const APP_VERSION = '0.9.0';
+const APP_VERSION = '0.10.1';
 
 class Component extends DCLogic {
   state = {
@@ -1879,6 +1919,7 @@ class Component extends DCLogic {
     levelWiz: null, customDomains: [], newDomainName: '', importedDomainCards: {}, cardImportText: '', cardImportResult: null,
     customAncestries: [], newAncestryName: '', newAncestryFeature: '',
     newConditionName: '', confirmDelete: false, rosterDeleteConfirmId: null, compDeleteConfirmKey: null, undo: null, wizard: null, bannerMode: 'none',
+    importError: '', importConflict: null, exportMenuOpen: false,
     customClasses: [], newClassName: '', newClassDesc: '',
     sessionElapsed: 0, sessionRunning: false,
     updateAvailable: false, updateVersion: '',
@@ -2920,6 +2961,174 @@ class Component extends DCLogic {
     };
   }
 
+  // Fills in any fields missing from an older/partial character object with
+  // current defaults, mutating in place. This is the app's schema migration
+  // path — previously inlined in renderVals() (runs lazily on every render),
+  // also reused by JSON import so an imported file gets the same treatment
+  // as an old localStorage save that's a few versions behind.
+  normalizeChar(c) {
+    if (!c.downtime) c.downtime = { moves: this.defaultDowntimeMoves(), project: { name: '', progress: 0, max: 6 } };
+    if (!c.conditions) c.conditions = this.defaultConditions();
+    if (!c.shortRest) c.shortRest = { moves: this.defaultShortRestMoves() };
+    if (!c.weapons) c.weapons = this.defaultWeapons();
+    if (!c.weaponsPrimary) {
+      c.weaponsPrimary = (c.weapons.primary && c.weapons.primary.name)
+        ? [{ name: c.weapons.primary.name, range: c.weapons.primary.range || 'Melee', damage: c.weapons.primary.damage || '', equipped: true, features: [] }]
+        : [];
+    }
+    if (!c.weaponsSecondary) {
+      c.weaponsSecondary = (c.weapons.secondaryEnabled && c.weapons.secondary && c.weapons.secondary.name)
+        ? [{ name: c.weapons.secondary.name, range: c.weapons.secondary.range || 'Melee', damage: c.weapons.secondary.damage || '', equipped: true, features: [] }]
+        : [];
+    }
+    if (!c.equippedArmor) c.equippedArmor = { name: '', score: c.armorScore || 3 };
+    if (!c.companions) { c.companions = c.companion ? [c.companion] : []; c.activeCompanion = 0; }
+    if (c.activeCompanion == null) c.activeCompanion = 0;
+    if (c.activeCompanion >= c.companions.length) c.activeCompanion = Math.max(0, c.companions.length - 1);
+    if (!c.wildshape) c.wildshape = this.defaultWildshape();
+    if (!c.transformation) c.transformation = this.defaultTransformation();
+    if (!c.dmgMods) c.dmgMods = [];
+    if (!c.trackers) c.trackers = [];
+    if (!c.restItems) c.restItems = [];
+    if (!c.cards) c.cards = [];
+    if (!c.experiences) c.experiences = [];
+    if (!c.gold) c.gold = { Handfuls: 0, Bags: 0, Chests: 0 };
+    if (!c.adv) c.adv = {};
+    if (!c.levelLog) c.levelLog = [];
+    if (typeof c.inventory !== 'string') c.inventory = '';
+    if (typeof c.notes !== 'string') c.notes = '';
+    return c;
+  }
+
+  // Strips characters that would be awkward/unsafe in a downloaded filename,
+  // collapsing whitespace to nothing rather than swapping in underscores.
+  sanitizeFilename(str) {
+    return (str || '').replace(/[^a-zA-Z0-9_-]+/g, '');
+  }
+
+  downloadJson(filename, dataObj) {
+    const blob = new Blob([JSON.stringify(dataObj, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
+  exportCharacterJson() {
+    const c = this.active();
+    if (!c) return;
+    const charName = this.sanitizeFilename(c.name) || 'character';
+    const campaign = ((this.state.games || []).find(g => g.id === this.state.activeGame) || { name: 'campaign' }).name;
+    const campaignName = this.sanitizeFilename(campaign) || 'campaign';
+    const payload = Object.assign({}, JSON.parse(JSON.stringify(c)), { schemaVersion: (typeof APP_VERSION !== 'undefined' ? APP_VERSION : '') });
+    this.downloadJson(charName + '-' + campaignName + '.json', payload);
+  }
+
+  // Required for a file to be treated as a character at all — deliberately
+  // small; normalizeChar() backfills everything else. 'class'/'stats' in the
+  // feature spec map to this schema's klass/traits fields.
+  importRequiredKeys() {
+    return ['name', 'klass', 'traits', 'hp', 'inventory'];
+  }
+
+  handleImportedFile(rawText) {
+    let raw;
+    try {
+      raw = JSON.parse(rawText);
+    } catch (e) {
+      this.setState({ importError: 'That file isn’t valid JSON — nothing was imported.' });
+      return;
+    }
+    if (!raw || typeof raw !== 'object' || Array.isArray(raw)) {
+      this.setState({ importError: 'That file doesn’t look like a character export — nothing was imported.' });
+      return;
+    }
+    const missing = this.importRequiredKeys().filter(k => !(k in raw));
+    if (missing.length) {
+      this.setState({ importError: 'That file is missing required character data (' + missing.join(', ') + ') — nothing was imported.' });
+      return;
+    }
+
+    // Snapshot which top-level keys the import actually specified BEFORE
+    // migration fills in defaults for anything missing — otherwise every
+    // field would look "present" post-migration and the merge path below
+    // couldn't tell a real value apart from a backfilled default.
+    const rawKeys = Object.keys(raw).filter(k => k !== 'schemaVersion');
+    const migrated = JSON.parse(JSON.stringify(raw));
+    delete migrated.schemaVersion;
+    this.normalizeChar(migrated);
+
+    const chars = this.state.chars || [];
+    const norm = n => (n || '').trim().toLowerCase();
+    const dup = (migrated.id && chars.find(ch => ch.id === migrated.id))
+      || chars.find(ch => norm(ch.name) === norm(migrated.name));
+
+    if (!dup) {
+      if (!migrated.id || chars.some(ch => ch.id === migrated.id)) migrated.id = 'c' + Date.now();
+      this.upAll(list => list.push(migrated));
+      return;
+    }
+    this.setState({ importConflict: { migrated, rawKeys, existingId: dup.id } });
+  }
+
+  importAsNewChar(migrated, rawKeys, chars) {
+    const nc = JSON.parse(JSON.stringify(migrated));
+    nc.id = 'c' + Date.now();
+    const baseName = nc.name || 'Imported character';
+    const norm = n => (n || '').trim().toLowerCase();
+    let n = 2;
+    nc.name = baseName;
+    while (chars.some(ch => norm(ch.name) === norm(nc.name))) {
+      nc.name = baseName + ' (' + n + ')';
+      n++;
+    }
+    return nc;
+  }
+
+  mergeChar(existing, migrated, rawKeys) {
+    const merged = JSON.parse(JSON.stringify(existing));
+    rawKeys.forEach(k => {
+      if (k === 'id') return; // never change the existing character's id on merge
+      merged[k] = migrated[k];
+    });
+    return merged;
+  }
+
+  computeMergeDiff(existing, migrated, rawKeys) {
+    const lines = [];
+    const eq = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+    const label = k => ({ klass: 'Class', hp: 'HP', armorScore: 'Armor Score' }[k]) || (k.charAt(0).toUpperCase() + k.slice(1));
+    const pipDiff = (name, oldV, newV, keys) => {
+      const parts = keys.filter(k => oldV[k] !== newV[k]).map(k => k + ' ' + oldV[k] + '→' + newV[k]);
+      if (parts.length) lines.push(name + ': ' + parts.join(', '));
+    };
+    rawKeys.forEach(k => {
+      if (k === 'id') return;
+      const oldV = existing[k], newV = migrated[k];
+      if (eq(oldV, newV)) return;
+      if ((k === 'hp' || k === 'stress' || k === 'hope' || k === 'armor') && oldV && newV) {
+        pipDiff(label(k), oldV, newV, ['max', 'marked']);
+      } else if (k === 'thresholds' && oldV && newV) {
+        pipDiff('Thresholds', oldV, newV, ['major', 'severe']);
+      } else if (k === 'traits' && oldV && newV) {
+        pipDiff('Traits', oldV, newV, Object.keys(newV));
+      } else if (k === 'gold' && oldV && newV) {
+        pipDiff('Gold', oldV, newV, Object.keys(newV));
+      } else if (Array.isArray(oldV) && Array.isArray(newV)) {
+        const delta = newV.length - oldV.length;
+        lines.push(label(k) + ': ' + oldV.length + ' → ' + newV.length + ' item(s)' + (delta ? ' (' + (delta > 0 ? '+' : '') + delta + ')' : ''));
+      } else if (typeof oldV !== 'object' && typeof newV !== 'object') {
+        lines.push(label(k) + ': ' + oldV + ' → ' + newV);
+      } else {
+        lines.push(label(k) + ' changed');
+      }
+    });
+    return lines;
+  }
+
   dmgCalc(c) {
     const base = parseInt(this.state.dmgInput, 10);
     if (!c || isNaN(base)) return { txt: 'Enter incoming damage to preview the result.', hp: 0, valid: false };
@@ -2971,7 +3180,10 @@ class Component extends DCLogic {
       dark,
       toggleDark: () => this.toggleDark(),
       darkLabel: dark ? '☀ Light' : '☾ Dark',
-      exportPdf: () => window.print(),
+      exportMenuOpen: !!s.exportMenuOpen,
+      toggleExportMenu: () => this.setState({ exportMenuOpen: !s.exportMenuOpen }),
+      exportPdf: () => { this.setState({ exportMenuOpen: false }); window.print(); },
+      exportJson: () => { this.setState({ exportMenuOpen: false }); this.exportCharacterJson(); },
       sessionTimeTxt: this.fmtTime(s.sessionElapsed || 0),
       sessionRunning: !!s.sessionRunning,
       sessionToggle: () => this.setState({ sessionRunning: !s.sessionRunning }),
@@ -3147,6 +3359,18 @@ class Component extends DCLogic {
         chars.push(nc);
         setTimeout(() => this.setState({ screen: 'sheet', activeId: nc.id, tab: 'edit' }), 0);
       }),
+      importFileChange: (e) => {
+        const file = e.target.files && e.target.files[0];
+        e.target.value = '';
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => this.handleImportedFile(reader.result);
+        reader.onerror = () => this.setState({ importError: 'Couldn’t read that file.' });
+        reader.readAsText(file);
+      },
+      importErrorOpen: !!s.importError,
+      importErrorText: s.importError,
+      dismissImportError: () => this.setState({ importError: '' }),
       rosterCards: (s.chars || []).map(ch => {
         const firstComp = (ch.companions && ch.companions.length) ? ch.companions[0] : null;
         if (firstComp && !firstComp.portraitKey) firstComp.portraitKey = 'comp-' + Math.random().toString(36).slice(2, 9);
@@ -3179,6 +3403,29 @@ class Component extends DCLogic {
         };
       })
     };
+
+    vals.importConflictOpen = !!s.importConflict;
+    if (s.importConflict) {
+      const { migrated, rawKeys, existingId } = s.importConflict;
+      const chars = s.chars || [];
+      const existing = chars.find(ch => ch.id === existingId);
+      vals.importConflictName = migrated.name;
+      vals.importCancelConflict = () => this.setState({ importConflict: null });
+      vals.importAsNew = () => {
+        this.upAll(list => { list.push(this.importAsNewChar(migrated, rawKeys, list)); });
+        this.setState({ importConflict: null });
+      };
+      vals.importMerge = () => {
+        this.upAll(list => {
+          const idx = list.findIndex(ch => ch.id === existingId);
+          if (idx > -1) list[idx] = this.mergeChar(list[idx], migrated, rawKeys);
+        });
+        this.setState({ importConflict: null });
+      };
+      const diffLines = existing ? this.computeMergeDiff(existing, migrated, rawKeys) : [];
+      vals.importMergeDiffLines = diffLines.map(text => ({ text }));
+      vals.importMergeDiffHasLines = diffLines.length > 0;
+    }
 
     vals.openWizard = () => this.setState({ wizard: this.newWizard() });
     vals.wizardOpen = !!s.wizard;
@@ -3349,26 +3596,7 @@ class Component extends DCLogic {
     vals.multiclassLabel = c.multiclass ? c.multiclass.klass + (c.multiclass.subclass ? ' (' + c.multiclass.subclass + ')' : '') : '';
     vals.toggleMulticlass = () => this.up(ch => { ch.multiclass = ch.multiclass ? null : { klass: '', subclass: '' }; });
 
-    if (!c.downtime) c.downtime = { moves: this.defaultDowntimeMoves(), project: { name: '', progress: 0, max: 6 } };
-    if (!c.conditions) c.conditions = this.defaultConditions();
-    if (!c.shortRest) c.shortRest = { moves: this.defaultShortRestMoves() };
-    if (!c.weapons) c.weapons = this.defaultWeapons();
-    if (!c.weaponsPrimary) {
-      c.weaponsPrimary = (c.weapons.primary && c.weapons.primary.name)
-        ? [{ name: c.weapons.primary.name, range: c.weapons.primary.range || 'Melee', damage: c.weapons.primary.damage || '', equipped: true, features: [] }]
-        : [];
-    }
-    if (!c.weaponsSecondary) {
-      c.weaponsSecondary = (c.weapons.secondaryEnabled && c.weapons.secondary && c.weapons.secondary.name)
-        ? [{ name: c.weapons.secondary.name, range: c.weapons.secondary.range || 'Melee', damage: c.weapons.secondary.damage || '', equipped: true, features: [] }]
-        : [];
-    }
-    if (!c.equippedArmor) c.equippedArmor = { name: '', score: c.armorScore || 3 };
-    if (!c.companions) { c.companions = c.companion ? [c.companion] : []; c.activeCompanion = 0; }
-    if (c.activeCompanion == null) c.activeCompanion = 0;
-    if (c.activeCompanion >= c.companions.length) c.activeCompanion = Math.max(0, c.companions.length - 1);
-    if (!c.wildshape) c.wildshape = this.defaultWildshape();
-    if (!c.transformation) c.transformation = this.defaultTransformation();
+    this.normalizeChar(c);
 
     const isDruid = c.klass === 'Druid' || (c.multiclass && c.multiclass.klass === 'Druid');
     const isCompanionClass = c.klass === 'Ranger' || c.klass === 'Druid' || (c.multiclass && (c.multiclass.klass === 'Ranger' || c.multiclass.klass === 'Druid'));

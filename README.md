@@ -12,7 +12,7 @@
 A single-file, offline-friendly character tracker for Daggerheart — built to run anywhere
 a browser does, with no install, no server, and no account.
 
-**Current version:** `0.9.0` — also shown live in the app itself, top-left of the Party Roster
+**Current version:** `0.10.1` — also shown live in the app itself, top-left of the Party Roster
 screen. Compare that number to the [changelog](#changelog) below to see if the copy hosted
 on GitHub Pages is up to date. The app also checks for updates itself (see
 "Keeping deployed copies current" below) and will tell you directly if it's stale.
@@ -40,6 +40,8 @@ on GitHub Pages is up to date. The app also checks for updates itself (see
 - Companion sheets: stats, HP/Stress, attacks, features, backstory
 - Downtime moves, short/long rest (long rest clears HP, Stress, and Armor marks, and
   resets rest-only features)
+- Export a character as JSON and re-import it elsewhere — handy for moving a
+  character between devices/browsers, or as a backup outside of localStorage
 - Session recaps log
 - Light and dark themes, with a per-campaign accent color
 
@@ -87,6 +89,29 @@ version string. If you forget to update `version.json`, nothing breaks; the bann
 just won't show up until it's fixed.
 
 ## Changelog
+[0.10.1] — 2026-07-19
+
+Changed
+
+- Export PDF / Export JSON moved into a "⋯" overflow menu on the Sheet header,
+  same dropdown pattern as the "Pages" menu, so they're not sitting right next
+  to the buttons players tap during normal play.
+
+[0.10.0] — 2026-07-19
+
+Added
+
+- JSON export/import for character sheets. The Sheet screen has an "Export JSON"
+  button that downloads the full character object as {charactername}-{campaignname}.json.
+  The Roster screen has a matching "Import character" tile — imported files are
+  validated and run through the same schema-migration path as an old localStorage
+  save. If the imported character's id or name matches an existing character, a
+  dialog offers Cancel / Import as new (auto-suffixes the name on collision) /
+  Merge (imported file wins per differing field, but never touches fields absent
+  from the imported JSON), with a before→after diff summary shown before merging.
+  Malformed JSON or a file missing required fields shows an error toast instead of
+  corrupting the roster.
+
 [0.9.0] — 2026-07-19
 
 Added

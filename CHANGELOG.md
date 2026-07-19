@@ -2,6 +2,19 @@
 
 All notable changes to the Daggerheart Tracker are logged here. Format loosely follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [0.10.1] — 2026-07-19
+
+### Changed
+- **Export PDF / Export JSON moved into a "⋯" overflow menu** on the Sheet header, same dropdown pattern as the "Pages" menu. They were sitting right next to the Dark/Light toggle and session timer controls, easy to tap by accident — tucking them away cuts down on that for less careful hands at the table.
+
+## [0.10.0] — 2026-07-19
+
+### Added
+- **JSON export/import for character sheets.** The Sheet screen has an "Export JSON" button (next to Export PDF) that downloads the full character object — same shape as the localStorage schema, plus a `schemaVersion` key — as `{charactername}-{campaignname}.json` (sanitized filename).
+- The Roster screen has a matching "Import character" tile. Imported files are parsed, validated for required fields (name, class, stats, HP, inventory), and run through the same schema-migration path used for old localStorage saves (extracted into a reusable `normalizeChar()`), so an import a few versions behind still loads cleanly.
+- **Conflict handling on import.** If the imported character's id or name matches an existing character, a dialog offers three options: **Cancel** (no changes), **Import as new** (fresh id, auto-suffixes the name on collision — e.g. "Kael Ashwind (2)"), or **Merge** (imported file wins per differing field, but fields absent from the imported JSON are left untouched — handles partial/older exports without clobbering data the import never mentioned). Merge shows a before→after diff summary of every field that would actually change before you commit to it.
+- Malformed JSON or a file missing required character data shows an error toast instead of silently corrupting the roster.
+
 ## [0.9.0] — 2026-07-19
 
 ### Added

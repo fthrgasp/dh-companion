@@ -1114,6 +1114,18 @@ CARD: ...</pre>
       </div>
     </div>
   </sc-if>
+  <sc-if value="{{profDoubleConfirmOpen}}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;inset:0;background:rgba(20,18,14,0.45);display:flex;align-items:center;justify-content:center;z-index:150;padding:20px">
+      <div style="background:var(--panel);border-radius:16px;width:100%;max-width:400px;padding:26px 28px;box-shadow:0 20px 50px rgba(0,0,0,0.25)">
+        <div style="font-family:'Spectral',serif;font-size:19px;font-weight:600;margin-bottom:8px">Increase Proficiency again?</div>
+        <p style="font-size:13.5px;color:var(--muted);margin:0 0 20px;line-height:1.5">Reaching this level already bumped Proficiency automatically for hitting a new tier. Picking this too means taking it twice this level — that's usually not intended, but it's your call.</p>
+        <div style="display:flex;gap:8px;justify-content:flex-end">
+          <button sc-camel-on-click="{{profDoubleConfirmNo}}" style="border:1px solid var(--border2);background:var(--panel);color:var(--text);border-radius:8px;padding:9px 16px;font-size:13.5px;cursor:pointer">Cancel</button>
+          <button sc-camel-on-click="{{profDoubleConfirmYes}}" style="border:none;background:#A33B3B;color:#fff;border-radius:8px;padding:9px 18px;font-size:13.5px;font-weight:600;cursor:pointer">Yes, add anyway</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
   </sc-if>
 
   <!-- ======== EDIT TAB ======== -->
@@ -1809,7 +1821,7 @@ CARD: ...</pre>
 
 </script>
 <script>
-const APP_VERSION = '1.3.1';
+const APP_VERSION = '1.3.2';
 
 class Component extends DCLogic {
   state = {
@@ -3769,17 +3781,31 @@ class Component extends DCLogic {
       vals.wizNewMajor = c.thresholds.major + 1;
       vals.wizNewSevere = c.thresholds.severe + 1;
       vals.wizStart = () => this.setState({ levelWiz: { ...wiz, step: 1 } });
+      const isTierBreak = [2, 5, 8].includes(c.level + 1);
       const mkOpt = (key) => advDefs.map((d, i) => {
         const sel = (key === 'pickA' ? wiz.pickA === i : wiz.pickB === i);
         return {
           label: d.label, desc: d.desc,
           selBg: sel ? theme.highlightBg : theme.panel,
           selBc: sel ? accent : theme.border,
-          pick: () => this.setState({ levelWiz: { ...wiz, [key]: i } })
+          pick: () => {
+            if (d.key === 'prof' && isTierBreak) {
+              this.setState({ levelWiz: { ...wiz, profConfirmPending: key } });
+            } else {
+              this.setState({ levelWiz: { ...wiz, [key]: i } });
+            }
+          }
         };
       });
       vals.wizOptionsA = mkOpt('pickA');
       vals.wizOptionsB = mkOpt('pickB');
+      vals.profDoubleConfirmOpen = !!wiz.profConfirmPending;
+      vals.profDoubleConfirmYes = () => {
+        const key = wiz.profConfirmPending;
+        const profIdx = advDefs.findIndex(d => d.key === 'prof');
+        this.setState({ levelWiz: { ...wiz, [key]: profIdx, profConfirmPending: null } });
+      };
+      vals.profDoubleConfirmNo = () => this.setState({ levelWiz: { ...wiz, profConfirmPending: null } });
       vals.wizNext1Disabled = wiz.pickA === null;
       vals.wizNext1Opacity = wiz.pickA === null ? '0.5' : '1';
       vals.wizNext2Disabled = wiz.pickB === null;
@@ -3797,6 +3823,10 @@ class Component extends DCLogic {
           ch.thresholds.major += 1;
           ch.thresholds.severe += 1;
           ch.levelLog.unshift({ text: 'Reached level ' + ch.level + ' — thresholds increased by 1.' });
+          if ([2, 5, 8].includes(ch.level)) {
+            ch.proficiency += 1;
+            ch.levelLog.unshift({ text: 'Level ' + ch.level + ': Proficiency automatically increased to ' + ch.proficiency + ' (new tier).' });
+          }
           [pickA, pickB].forEach(i => {
             if (i === null) return;
             const d = advDefs[i];

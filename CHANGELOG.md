@@ -2,6 +2,12 @@
 
 All notable changes to the Daggerheart Tracker are logged here. Format loosely follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [1.3.2] — 2026-07-19
+
+### Fixed
+- **Proficiency now auto-scales at tier breaks.** Reaching level 2, 5, or 8 automatically bumps Proficiency by 1, matching the same formula used when a character is created directly at a higher level. Previously this only happened if a player remembered to spend one of their two advancement picks on "+1 Proficiency," so tables that forgot fell permanently behind.
+- The "+1 Proficiency" advancement option is still pickable on any level, including tier-break levels. Picking it on a level where Proficiency just auto-increased now prompts a confirmation ("Increase Proficiency again?") since that stacks an extra point on top of the automatic one — occasionally intentional, so it's a warning rather than a block.
+
 ## [1.3.1] — 2026-07-18
 
 ### Added

@@ -12,7 +12,7 @@
 A single-file, offline-friendly character tracker for Daggerheart — built to run anywhere
 a browser does, with no install, no server, and no account.
 
-**Current version:** `1.3.1` — also shown live in the app itself, top-left of the Party Roster
+**Current version:** `1.3.2` — also shown live in the app itself, top-left of the Party Roster
 screen. Compare that number to the [changelog](#changelog) below to see if the copy hosted
 on GitHub Pages is up to date. The app also checks for updates itself (see
 "Keeping deployed copies current" below) and will tell you directly if it's stale.
@@ -87,6 +87,18 @@ version string. If you forget to update `version.json`, nothing breaks; the bann
 just won't show up until it's fixed.
 
 ## Changelog
+[1.3.2] — 2026-07-19
+
+Fixed
+
+- Proficiency now auto-scales at tier breaks (levels 2/5/8), matching the same formula
+  used when a character is created directly at a higher level. Previously this only
+  happened if a player remembered to spend an advancement pick on "+1 Proficiency,"
+  so tables that forgot fell permanently behind.
+- The manual "+1 Proficiency" advancement option is still pickable at any level. Picking
+  it on a level where Proficiency just auto-increased now prompts a confirmation, since
+  that stacks an extra point on top of the automatic one.
+
 [1.3.0] — 2026-07-18
 
 Added
@@ -146,7 +158,6 @@ Version bumped 1.1.0 → 1.2.0.
 
 ## KNOWN BUGS
 
-- Level-up wizard doesn't auto-scale Proficiency at tier breaks (levels 2/5/8) — known bug, not yet fixed.
 - Duplicate-experience prevention — still needs a decision on what exactly should de-duplicate (raised, not yet scoped).
 
 ## Possible future work

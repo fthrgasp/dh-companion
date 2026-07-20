@@ -9,10 +9,12 @@
 > guarantee this app won't curse your bloodline for nine generations if you
 > mismark a domain card. Play at your own risk.
 
-A single-file, offline-friendly character tracker for Daggerheart — built to run anywhere
-a browser does, with no install, no server, and no account.
+An offline-friendly character tracker for Daggerheart — built to run anywhere a browser
+does, with no install and no account required. Optionally sign in with a magic-link
+email to sync your characters and a campaign's shared inventory across devices; skip
+that and it works exactly as a local-only, no-account tool.
 
-**Current version:** `0.10.1` — also shown live in the app itself, top-left of the Party Roster
+**Current version:** `0.12.0` — also shown live in the app itself, top-left of the Party Roster
 screen. Compare that number to the [changelog](#changelog) below to see if the copy hosted
 on GitHub Pages is up to date. The app also checks for updates itself (see
 "Keeping deployed copies current" below) and will tell you directly if it's stale.
@@ -51,15 +53,22 @@ portrait.
 
 ## How it's built
 
-This is a plain HTML/CSS/JS file — no build step, no framework, no external requests
-once the page has loaded (fonts are embedded, images are stored locally in the
-browser). Character data is saved to the browser's `localStorage`, scoped to whatever
-URL the page is served from.
+The deployed app (`Daggerheart_Tracker.html`) is a plain HTML/CSS/JS file — no build
+step, no framework. Fonts are embedded and images are stored locally in the browser,
+so it works fully offline once loaded. Character data is saved to the browser's
+`localStorage` by default, scoped to whatever URL the page is served from.
 
-**Important:** data does *not* sync between devices or browsers. If you open the app
-on your phone and your iPad, each one keeps its own separate save. There's currently
-no shared/cloud storage — see the "Possible future work" note below if that ever
-becomes worth doing.
+**Optional account sync:** signing in (magic-link email, no password) syncs your
+characters and a campaign's shared inventory to a small Postgres backend (Supabase),
+so they follow you across devices instead of being stuck in one browser. This is
+entirely opt-in — skip it (or sign out) and the app behaves exactly as the fully
+local, no-account tool described above. Nothing about a signed-in session is
+required to use any character sheet feature.
+
+There's also a `/dh-tracker` directory in this repo — a Vite-based, multi-file
+restructure of the same app (same behavior, just split across modules instead of
+one file) used for active development. The deployed GitHub Pages site still runs
+`Daggerheart_Tracker.html` for now.
 
 ## Running it
 
@@ -89,6 +98,30 @@ version string. If you forget to update `version.json`, nothing breaks; the bann
 just won't show up until it's fixed.
 
 ## Changelog
+[0.12.0] — 2026-07-19
+
+Changed
+
+- Restructured into a Vite project under `/dh-tracker` for active development
+  (pure reorganization, no behavior change). The deployed site still runs
+  `Daggerheart_Tracker.html`.
+
+Added
+
+- Shared campaign inventory sync for signed-in players — share an invite link
+  from Options, anyone who opens it while signed in joins automatically, and
+  everyone in the campaign can add/edit/remove shared items live across
+  devices. Last-write-wins, no conflict dialogs. Unshared campaigns and
+  signed-out use are unaffected.
+
+[0.11.0] — 2026-07-19
+
+Added
+
+- Optional account sign-in (magic-link email, no password) with cross-device
+  character sync. Signing out or never signing in keeps the app fully local,
+  exactly as before.
+
 [0.10.1] — 2026-07-19
 
 Changed
@@ -219,9 +252,10 @@ None currently tracked.
 
 ## Possible future work
 
-- Shared/cloud storage so the whole party can see one live campaign state instead of
-  each device keeping its own copy — a meaningfully bigger project involving a real
-  backend, noted here for reference rather than currently planned
+- GM dashboard view: GM sees every party member's full character sheet, players see
+  only their own (plus everyone's roster-card summary — name/HP/Stress/class/level).
+  Creatures/bestiary would become a shared resource like Party inventory rather than
+  GM-only. Scoped but not yet built.
 
 - Void domain cards still need someone to type them in once. Blood and Dread have zero 
   cards in them until they're imported — use the new Bulk card import panel in the Compendium 

@@ -2,6 +2,23 @@
 
 All notable changes to the Daggerheart Tracker are logged here. Format loosely follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [0.12.0] — 2026-07-19
+
+### Changed
+- **Restructured into a Vite project (`/dh-tracker`).** The single-file `Daggerheart_Tracker.html` (~4,700 lines) is split into `src/core` (template engine, state, undo, migrations, storage, Supabase), `src/screens` (one file per screen), and `src/features` (character wizard, damage calculator). Pure reorganization — no logic or behavior changes; verified line-for-line against the original, including a full pass through every screen, every sheet tab, the character wizard, undo, and a production `npm run build`. The old single-file version stays at the repo root as a fallback, not actively maintained going forward.
+
+### Added
+- **Shared inventory sync.** Signed-in players can now share a campaign's inventory across every device at the table instead of it being stuck in one browser. Open Options → Share campaign to generate an invite link; anyone who opens it while signed in joins automatically (no approval step — the link itself is the invite). Everyone in a shared campaign can add, edit, or remove any item, matching how a table already shares physical loot.
+- Shared inventory uses simple last-write-wins syncing — no conflict dialogs, no waiting on a lock. At this scale (a handful of players, infrequent simultaneous edits) that's a better trade than the complexity of per-row version checks.
+- A campaign that hasn't been shared, or a player who never signs in, sees zero change — inventory stays exactly as local as it's always been.
+
+## [0.11.0] — 2026-07-19
+
+### Added
+- **Optional account sign-in with cross-device character sync.** Sign in with a magic-link email (Supabase Auth, no password) and your characters sync to a Postgres backend instead of staying stuck in one browser's localStorage — the fix for "I made my character on my phone but we're playing on my laptop." Everything else (shared inventory, recaps, compendium, creatures) is unaffected and stays local for now; that's still on the roadmap for later steps.
+- Signing in for the first time offers to import any characters already saved locally in that browser, so upgrading doesn't silently orphan existing sheets.
+- **"Continue without an account" stays fully supported.** Nothing is required to keep using the tracker exactly as before — the sign-in screen can be dismissed permanently per device, and signing out returns to local-only mode with no data loss.
+
 ## [0.10.1] — 2026-07-19
 
 ### Changed

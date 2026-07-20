@@ -1,2 +1,4 @@
 .claude/settings.local.json
-index.html
+/index.html
+dh-tracker/node_modules/
+dh-tracker/dist/

@@ -57,6 +57,42 @@ input,select,textarea,button{font-family:inherit;color:var(--text,#26221b)}
   </div>
 </sc-if>
 
+<!-- ============ SIGN IN ============ -->
+<sc-if value="{{showAuthGate}}" hint-placeholder-val="{{ false }}">
+<div data-screen-label="Sign In" style="max-width:400px;margin:0 auto;padding:80px 32px">
+  <div style="background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:32px;box-shadow:0 1px 3px rgba(38,34,27,0.06)">
+    <h1 style="font-family:'Spectral',serif;font-weight:600;font-size:24px;margin:0 0 6px">Sign in</h1>
+    <p style="font-size:13px;color:var(--muted);margin:0 0 20px">Sign in to sync your characters across devices. We'll email you a magic link — no password needed.</p>
+    <sc-if value="{{authMagicLinkSent}}" hint-placeholder-val="{{ false }}">
+      <p style="font-size:13.5px;color:var(--text)">Check your email for a sign-in link.</p>
+    </sc-if>
+    <sc-if value="{{authFormOpen}}" hint-placeholder-val="{{ true }}">
+      <input type="email" value="{{authEmail}}" sc-camel-on-change="{{setAuthEmail}}" placeholder="you@example.com" style="width:100%;box-sizing:border-box;border:1px solid var(--border2);border-radius:8px;padding:10px 12px;font-size:14px;background:var(--input-bg);margin-bottom:10px">
+      <sc-if value="{{authErrorOpen}}" hint-placeholder-val="{{ false }}">
+        <p style="font-size:12.5px;color:#A33B3B;margin:0 0 10px">{{authErrorText}}</p>
+      </sc-if>
+      <button sc-camel-on-click="{{sendMagicLink}}" style="width:100%;border:none;background:var(--accent,#8C5A2B);color:#fff;border-radius:8px;padding:10px;font-size:14px;font-weight:600;cursor:pointer">Send magic link</button>
+    </sc-if>
+    <div style="height:1px;background:var(--border3);margin:20px 0"></div>
+    <button sc-camel-on-click="{{skipAuthClick}}" style="width:100%;border:1px solid var(--border2);background:var(--panel);color:var(--text);border-radius:8px;padding:9px;font-size:13px;cursor:pointer">Continue without an account (this device only)</button>
+  </div>
+</div>
+</sc-if>
+
+<!-- ============ LOCAL CHARACTER IMPORT PROMPT ============ -->
+<sc-if value="{{localImportOpen}}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed;inset:0;z-index:200;background:rgba(38,34,27,0.45);display:flex;align-items:center;justify-content:center;padding:24px">
+    <div style="max-width:420px;background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:26px;box-shadow:0 8px 24px rgba(38,34,27,0.25)">
+      <h2 style="font-family:'Spectral',serif;font-weight:600;font-size:19px;margin:0 0 10px">Import local characters?</h2>
+      <p style="font-size:13.5px;color:var(--muted);margin:0 0 20px">This browser has {{localImportCount}} character(s) saved locally that aren't in your account yet. Import them now, or start fresh with an empty roster.</p>
+      <div style="display:flex;gap:10px;justify-content:flex-end">
+        <button sc-camel-on-click="{{dismissLocalImport}}" style="border:1px solid var(--border2);background:var(--panel);color:var(--text);border-radius:8px;padding:9px 14px;font-size:13px;cursor:pointer">Start fresh</button>
+        <button sc-camel-on-click="{{confirmLocalImport}}" style="border:none;background:var(--accent,#8C5A2B);color:#fff;border-radius:8px;padding:9px 16px;font-size:13px;font-weight:600;cursor:pointer">Import</button>
+      </div>
+    </div>
+  </div>
+</sc-if>
+
 <!-- ============ ROSTER ============ -->
 <sc-if value="{{isRoster}}" hint-placeholder-val="{{ true }}">
 <div data-screen-label="Party Roster" style="max-width:1180px;margin:0 auto;padding:48px 32px;position:relative;z-index:0">
@@ -78,6 +114,9 @@ input,select,textarea,button{font-family:inherit;color:var(--text,#26221b)}
       <span title="Build version — check the README changelog to see if a newer one is available" style="font-size:10.5px;color:var(--muted);background:var(--panel);border:1px solid var(--border2);border-radius:999px;padding:2px 8px;white-space:nowrap">{{appVersion}}</span>
     </div>
     <div style="position:relative;flex-shrink:0">
+      <sc-if value="{{hasSession}}" hint-placeholder-val="{{ false }}">
+        <button sc-camel-on-click="{{signOut}}" title="Sign out" style="border:1px solid var(--border2);background:var(--panel);color:var(--text);border-radius:8px;padding:8px 14px;font-size:13px;cursor:pointer" style-hover="border-color:var(--text)">Sign out</button>
+      </sc-if>
       <button sc-camel-on-click="{{toggleGameMenu}}" style="border:1px solid var(--border2);background:var(--panel);color:var(--text);border-radius:8px;padding:8px 14px;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:6px" style-hover="border-color:var(--text)">⚙ Options / {{activeGameName}} <span style="font-size:10px;color:var(--muted)">▾</span></button>
       <sc-if value="{{gameMenuOpen}}" hint-placeholder-val="{{ false }}">
         <div style="position:absolute;top:calc(100% + 6px);right:0;left:auto;z-index:50;min-width:260px;background:var(--panel);border:1px solid var(--border2);border-radius:10px;box-shadow:0 8px 24px rgba(38,34,27,0.18);padding:8px;display:flex;flex-direction:column;gap:2px">
@@ -115,6 +154,16 @@ input,select,textarea,button{font-family:inherit;color:var(--text,#26221b)}
               <button sc-camel-on-click="{{bm.select}}" style="border:1px solid {{bm.bc}};background:{{bm.bg}};color:{{bm.fg}};border-radius:7px;padding:6px 10px;font-size:12px;cursor:pointer">{{bm.label}}</button>
             </sc-for>
           </div>
+          <sc-if value="{{hasSession}}" hint-placeholder-val="{{ false }}">
+            <div style="height:1px;background:var(--border3);margin:6px 4px"></div>
+            <div style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);padding:4px 8px">Shared inventory</div>
+            <div style="padding:2px 8px 6px;display:flex;flex-direction:column;gap:4px">
+              <button sc-camel-on-click="{{shareCampaign}}" style="border:1px solid var(--border2);background:var(--panel);color:var(--text);border-radius:7px;padding:7px 10px;font-size:12.5px;cursor:pointer" style-hover="border-color:var(--text)">{{shareCampaignLabel}}</button>
+              <sc-if value="{{shareLinkCopied}}" hint-placeholder-val="{{ false }}">
+                <span style="font-size:11.5px;color:#4E7A4E">✓ Invite link copied</span>
+              </sc-if>
+            </div>
+          </sc-if>
           <div style="height:1px;background:var(--border3);margin:6px 4px"></div>
           <div style="display:flex;gap:6px;padding:2px 4px">
             <input value="{{newGameName}}" sc-camel-on-change="{{setNewGameName}}" placeholder="New campaign name" style="flex:1;border:1px solid var(--border2);border-radius:8px;padding:7px 10px;font-size:13px;background:var(--input-bg)">
@@ -1323,6 +1372,12 @@ CARD: ...</pre>
     <button sc-camel-on-click="{{dismissImportError}}" style="border:none;background:none;color:#fff;opacity:0.8;cursor:pointer;font-size:14px;padding:2px">✕</button>
   </div>
 </sc-if>
+<sc-if value="{{joinErrorOpen}}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:#A33B3B;color:#fff;border-radius:10px;padding:12px 14px 12px 18px;display:flex;align-items:center;gap:14px;box-shadow:0 12px 30px rgba(0,0,0,0.25);z-index:200;font-size:13.5px;max-width:90vw">
+    <span>{{joinErrorText}}</span>
+    <button sc-camel-on-click="{{dismissJoinError}}" style="border:none;background:none;color:#fff;opacity:0.8;cursor:pointer;font-size:14px;padding:2px">✕</button>
+  </div>
+</sc-if>
 <sc-if value="{{importConflictOpen}}" hint-placeholder-val="{{ false }}">
   <div style="position:fixed;inset:0;background:rgba(20,18,14,0.45);display:flex;align-items:center;justify-content:center;z-index:250;padding:20px">
     <div style="background:var(--panel);border-radius:16px;width:100%;max-width:480px;max-height:86vh;overflow:auto;padding:26px 28px;box-shadow:0 20px 50px rgba(0,0,0,0.25)">
@@ -1904,8 +1959,15 @@ CARD: ...</pre>
 })(window);
 
 </script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
-const APP_VERSION = '0.10.1';
+const APP_VERSION = '0.12.0';
+
+// Publishable (anon) key — safe to expose client-side; row-level security on
+// the `characters` table is the actual access boundary, not this key.
+const SUPABASE_URL = 'https://rrflddwsjxeajyldmwrh.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_z87KS6Di54wmXEUxl-MunA_64uF5K5P';
+const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 
 class Component extends DCLogic {
   state = {
@@ -1925,7 +1987,10 @@ class Component extends DCLogic {
     updateAvailable: false, updateVersion: '',
     games: [{ id: 'default', name: 'My Campaign' }], activeGame: 'default', newGameName: '', gameMenuOpen: false,
     editingGameId: null, renameGameVal: '',
-    creatures: [], newCreatureName: ''
+    creatures: [], newCreatureName: '',
+    session: null, authChecked: false, skipAuth: false, authEmail: '', authMagicLinkSent: false, authError: '',
+    localImportPrompt: null,
+    pendingJoinId: null, joinError: '', shareLinkCopied: false, sharingCampaign: false
   };
 
   gk(base) {
@@ -1985,6 +2050,11 @@ class Component extends DCLogic {
       dark: theme.dark, gameAccent: theme.gameAccent, bannerMode: theme.bannerMode,
       screen: 'roster', activeId: null, gameMenuOpen: false, newGameName: ''
     });
+    if (this.state.session) {
+      this.refreshCharsFromRemote(id);
+      const cloudId = this.cloudIdFor(id);
+      if (cloudId) this.refreshPartyFromRemote(cloudId);
+    }
   }
 
   addGame() {
@@ -2054,11 +2124,24 @@ class Component extends DCLogic {
     if (!games.some(g => g.id === activeGame)) activeGame = 'default';
     const data = this.loadGameData(activeGame);
     const theme = this.loadThemeFor(activeGame);
+    let skipAuth = false;
+    try { skipAuth = localStorage.getItem('dh-tracker-skip-auth') === '1'; } catch (e) {}
+    let pendingJoinId = null;
+    try {
+      const params = new URLSearchParams(location.search);
+      pendingJoinId = params.get('join');
+      if (pendingJoinId) {
+        params.delete('join');
+        const qs = params.toString();
+        history.replaceState(null, '', location.pathname + (qs ? '?' + qs : ''));
+      }
+    } catch (e) {}
     this.setState({
       games, activeGame, dark: theme.dark, gameAccent: theme.gameAccent, bannerMode: theme.bannerMode,
       chars: data.chars, party: data.party, recaps: data.recaps,
       customDomains: data.customDomains, customAncestries: data.customAncestries, customClasses: data.customClasses,
-      creatures: data.creatures, importedDomainCards: data.importedDomainCards, sessionElapsed: data.sessionElapsed
+      creatures: data.creatures, importedDomainCards: data.importedDomainCards, sessionElapsed: data.sessionElapsed,
+      skipAuth, pendingJoinId
     });
     this._timerInterval = setInterval(() => {
       if (this.state.sessionRunning) {
@@ -2067,10 +2150,86 @@ class Component extends DCLogic {
         this.setState({ sessionElapsed: next });
       }
     }, 1000);
+    if (supabaseClient) {
+      supabaseClient.auth.getSession().then(({ data }) => {
+        this.applySession(data && data.session ? data.session : null);
+      });
+      supabaseClient.auth.onAuthStateChange((event, session) => {
+        this.applySession(session);
+      });
+    } else {
+      this.setState({ authChecked: true });
+    }
   }
 
   componentWillUnmount() {
     if (this._timerInterval) clearInterval(this._timerInterval);
+  }
+
+  // Called on initial session check and every auth state change (sign-in,
+  // sign-out, token refresh). On a fresh sign-in, kicks off a remote fetch of
+  // the active game's characters — and, if that comes back empty, offers to
+  // import whatever is currently sitting in localStorage instead of silently
+  // discarding it.
+  applySession(session) {
+    const hadSession = !!this.state.session;
+    this.setState({ session, authChecked: true, authMagicLinkSent: false, authError: '' });
+    if (session && !hadSession) {
+      this.refreshCharsFromRemote(this.state.activeGame, { checkImport: true });
+      if (this.state.pendingJoinId) {
+        this.joinGame(this.state.pendingJoinId);
+      } else {
+        const cloudId = this.activeCloudId();
+        if (cloudId) this.refreshPartyFromRemote(cloudId);
+      }
+    }
+  }
+
+  refreshCharsFromRemote(gameId, opts) {
+    opts = opts || {};
+    this.loadCharsRemote(gameId).then(remoteChars => {
+      if (opts.checkImport && remoteChars.length === 0) {
+        const localChars = this.loadGameData(gameId).chars || [];
+        if (localChars.length) {
+          this.setState({ localImportPrompt: { gameId, count: localChars.length, chars: localChars } });
+          return;
+        }
+      }
+      this.setState({ chars: remoteChars });
+    });
+  }
+
+  confirmLocalImport() {
+    const prompt = this.state.localImportPrompt;
+    if (!prompt) return;
+    (prompt.chars || []).forEach(c => this.saveCharRemote(c, prompt.gameId));
+    this.setState({ chars: prompt.chars, localImportPrompt: null });
+  }
+
+  dismissLocalImport() {
+    this.setState({ chars: [], localImportPrompt: null });
+  }
+
+  setAuthEmail(email) { this.setState({ authEmail: email, authError: '' }); }
+
+  sendMagicLink() {
+    if (!supabaseClient) { this.setState({ authError: 'Supabase failed to load — check your connection.' }); return; }
+    const email = (this.state.authEmail || '').trim();
+    if (!email) return;
+    supabaseClient.auth.signInWithOtp({ email }).then(({ error }) => {
+      if (error) this.setState({ authError: error.message });
+      else this.setState({ authMagicLinkSent: true, authError: '' });
+    });
+  }
+
+  signOut() {
+    if (supabaseClient) supabaseClient.auth.signOut();
+    this.setState({ session: null });
+  }
+
+  setSkipAuth(val) {
+    try { localStorage.setItem('dh-tracker-skip-auth', val ? '1' : '0'); } catch (e) {}
+    this.setState({ skipAuth: val, pendingJoinId: null });
   }
 
   saveClasses(list) { try { localStorage.setItem(this.gk('dh-tracker-classes'), JSON.stringify(list)); } catch (e) {} }
@@ -2227,6 +2386,7 @@ class Component extends DCLogic {
       const party = JSON.parse(JSON.stringify(s.party || []));
       fn(party);
       this.saveParty(party);
+      this.syncPartyRemote(party, s.party);
       return { party };
     });
   }
@@ -2236,6 +2396,132 @@ class Component extends DCLogic {
       { id: 'p1', name: 'Rope, 50 ft', qty: 1, note: 'Shared climbing gear', holder: '' },
       { id: 'p2', name: 'Healing potions', qty: 3, note: 'Clear 1d4 HP', holder: '' }
     ];
+  }
+
+  // --- Shared campaigns / shared inventory (Supabase). A local game entry in
+  // games[] gains an optional cloudId once it's been shared; games without one
+  // stay exactly as local-only as they've always been.
+  cloudIdFor(gameId) {
+    const g = (this.state.games || []).find(x => x.id === gameId);
+    return g && g.cloudId;
+  }
+
+  activeCloudId() { return this.cloudIdFor(this.state.activeGame); }
+
+  loadPartyRemote(cloudId) {
+    if (!supabaseClient) return Promise.resolve([]);
+    return supabaseClient.from('party_items').select('id,data').eq('game_id', cloudId)
+      .then(({ data, error }) => {
+        if (error) { console.error('loadPartyRemote', error); return []; }
+        return (data || []).map(row => Object.assign({}, row.data, { id: row.id }));
+      })
+      .catch(e => { console.error('loadPartyRemote', e); return []; });
+  }
+
+  savePartyItemRemote(item, cloudId) {
+    if (!supabaseClient) return Promise.resolve();
+    return supabaseClient.from('party_items').upsert({ id: item.id, game_id: cloudId, data: item })
+      .then(({ error }) => { if (error) console.error('savePartyItemRemote', error); })
+      .catch(e => console.error('savePartyItemRemote', e));
+  }
+
+  deletePartyItemRemote(id) {
+    if (!supabaseClient) return Promise.resolve();
+    return supabaseClient.from('party_items').delete().eq('id', id)
+      .then(({ error }) => { if (error) console.error('deletePartyItemRemote', error); })
+      .catch(e => console.error('deletePartyItemRemote', e));
+  }
+
+  syncPartyRemote(party, prevParty) {
+    const cloudId = this.activeCloudId();
+    if (!this.state.session || !cloudId) return;
+    const nextIds = new Set((party || []).map(p => p.id));
+    (party || []).forEach(p => this.savePartyItemRemote(p, cloudId));
+    (prevParty || []).forEach(p => { if (!nextIds.has(p.id)) this.deletePartyItemRemote(p.id); });
+  }
+
+  refreshPartyFromRemote(cloudId) {
+    if (!cloudId) return;
+    this.loadPartyRemote(cloudId).then(party => this.setState({ party }));
+  }
+
+  // Creates the server-side campaign row + membership for the active local
+  // game the first time it's shared (idempotent — a game that's already
+  // shared just resolves its existing cloudId). The sharer's current local
+  // party list becomes the shared list's starting state.
+  ensureGameShared() {
+    const existing = this.activeCloudId();
+    if (existing) return Promise.resolve(existing);
+    if (!supabaseClient || !this.state.session) return Promise.resolve(null);
+    const activeGame = this.state.activeGame;
+    const localGame = (this.state.games || []).find(g => g.id === activeGame);
+    const name = (localGame && localGame.name) || 'Shared Campaign';
+    this.setState({ sharingCampaign: true });
+    return supabaseClient.from('games').insert({ name }).select('id').single()
+      .then(({ data, error }) => {
+        if (error) throw error;
+        const cloudId = data.id;
+        return supabaseClient.from('game_members').insert({ game_id: cloudId })
+          .then(({ error: memberErr }) => { if (memberErr) throw memberErr; return cloudId; });
+      })
+      .then(cloudId => {
+        (this.state.party || []).forEach(item => this.savePartyItemRemote(item, cloudId));
+        const games = this.state.games.map(g => g.id === activeGame ? Object.assign({}, g, { cloudId }) : g);
+        this.saveGames(games);
+        this.setState({ games, sharingCampaign: false });
+        return cloudId;
+      })
+      .catch(e => {
+        console.error('ensureGameShared', e);
+        this.setState({ sharingCampaign: false, joinError: 'Could not share this campaign — try again.' });
+        return null;
+      });
+  }
+
+  shareCampaign() {
+    this.ensureGameShared().then(cloudId => {
+      if (!cloudId) return;
+      const link = location.origin + location.pathname + '?join=' + cloudId;
+      try { navigator.clipboard.writeText(link); } catch (e) {}
+      this.setState({ shareLinkCopied: true });
+      setTimeout(() => this.setState({ shareLinkCopied: false }), 2500);
+    });
+  }
+
+  // Self-service join: possession of the link (i.e. this id) is the access
+  // model the group chose, so no owner-approval step — just record membership
+  // and drop the player into a new local game entry pointed at it.
+  joinGame(cloudId) {
+    if (!supabaseClient) return;
+    const existing = (this.state.games || []).find(g => g.cloudId === cloudId);
+    if (existing) {
+      this.setState({ pendingJoinId: null });
+      if (existing.id !== this.state.activeGame) this.switchGame(existing.id);
+      else this.refreshPartyFromRemote(cloudId);
+      return;
+    }
+    // ignoreDuplicates: re-clicking a link you're already a member of (or the
+    // auth listener firing more than once on load) must be a no-op, not an
+    // UPDATE — there's no update policy on this table since nothing here
+    // ever needs to change once a membership row exists.
+    supabaseClient.from('game_members').upsert({ game_id: cloudId }, { onConflict: 'game_id,user_id', ignoreDuplicates: true })
+      .then(({ error }) => {
+        if (error) throw error;
+        return supabaseClient.from('games').select('name').eq('id', cloudId).single();
+      })
+      .then(({ data, error }) => {
+        if (error) throw error;
+        const name = (data && data.name) || 'Shared Campaign';
+        const id = 'g' + Date.now();
+        const games = this.state.games.concat([{ id, name, cloudId }]);
+        this.saveGames(games);
+        this.setState({ games, pendingJoinId: null });
+        this.switchGame(id);
+      })
+      .catch(e => {
+        console.error('joinGame', e);
+        this.setState({ pendingJoinId: null, joinError: 'That invite link is invalid or has expired.' });
+      });
   }
 
   toggleDark() {
@@ -2267,12 +2553,52 @@ class Component extends DCLogic {
 
   save(chars) { try { localStorage.setItem(this.gk('dh-tracker-v1'), JSON.stringify(chars)); } catch (e) {} }
 
+  // --- Remote (Supabase) character persistence — only used while signed in.
+  // localStorage stays the source of truth when signed out, so the app keeps
+  // working offline/unauthenticated exactly as it always has.
+  loadCharsRemote(gameId) {
+    if (!supabaseClient) return Promise.resolve([]);
+    return supabaseClient.from('characters').select('id,data').eq('game_id', gameId)
+      .then(({ data, error }) => {
+        if (error) { console.error('loadCharsRemote', error); return []; }
+        return (data || []).map(row => Object.assign({}, row.data, { id: row.id }));
+      })
+      .catch(e => { console.error('loadCharsRemote', e); return []; });
+  }
+
+  saveCharRemote(char, gameId) {
+    if (!supabaseClient) return Promise.resolve();
+    return supabaseClient.from('characters').upsert({ id: char.id, game_id: gameId, data: char })
+      .then(({ error }) => { if (error) console.error('saveCharRemote', error); })
+      .catch(e => console.error('saveCharRemote', e));
+  }
+
+  deleteCharRemote(id) {
+    if (!supabaseClient) return Promise.resolve();
+    return supabaseClient.from('characters').delete().eq('id', id)
+      .then(({ error }) => { if (error) console.error('deleteCharRemote', error); })
+      .catch(e => console.error('deleteCharRemote', e));
+  }
+
+  // Mirrors a just-saved local chars[] array to Supabase, best-effort. Upserts
+  // everything currently present (cheap at this scale — mirrors the existing
+  // "write the whole array" behavior of save()) and deletes any id that
+  // dropped out of the array since the previous state.
+  syncCharsRemote(chars, prevChars) {
+    if (!this.state.session) return;
+    const gameId = this.state.activeGame;
+    const nextIds = new Set((chars || []).map(c => c.id));
+    (chars || []).forEach(c => this.saveCharRemote(c, gameId));
+    (prevChars || []).forEach(c => { if (!nextIds.has(c.id)) this.deleteCharRemote(c.id); });
+  }
+
   up(fn) {
     this.setState(s => {
       const chars = JSON.parse(JSON.stringify(s.chars));
       const c = chars.find(x => x.id === s.activeId);
       if (c) fn(c, chars);
       this.save(chars);
+      this.syncCharsRemote(chars, s.chars);
       return { chars };
     });
   }
@@ -2282,6 +2608,7 @@ class Component extends DCLogic {
       const chars = JSON.parse(JSON.stringify(s.chars));
       fn(chars);
       this.save(chars);
+      this.syncCharsRemote(chars, s.chars);
       return { chars };
     });
   }
@@ -3154,7 +3481,8 @@ class Component extends DCLogic {
   renderVals() {
     const s = this.state;
     const c = this.active();
-    const isSheet = s.screen === 'sheet' && !!c;
+    const showAuthGate = s.authChecked && !s.session && (!s.skipAuth || !!s.pendingJoinId);
+    const isSheet = s.screen === 'sheet' && !!c && !showAuthGate;
     const accent = s.gameAccent || this.props.accent || '#8C5A2B';
     const pipShape = this.props.pipShape ?? 'circle';
 
@@ -3189,11 +3517,32 @@ class Component extends DCLogic {
       sessionToggle: () => this.setState({ sessionRunning: !s.sessionRunning }),
       sessionReset: () => { try { localStorage.setItem(this.gk('dh-tracker-session-elapsed'), '0'); } catch (e) {} this.setState({ sessionElapsed: 0, sessionRunning: false }); },
       sessionToggleLabel: s.sessionRunning ? '⏸' : '▶',
-      isRoster: (s.screen === 'roster' || !c) && s.screen !== 'party' && s.screen !== 'recaps' && s.screen !== 'compendium' && s.screen !== 'creatures',
-      isCompendium: s.screen === 'compendium',
+      showAuthGate,
+      authEmail: s.authEmail || '',
+      setAuthEmail: (e) => this.setAuthEmail(e.target.value),
+      authMagicLinkSent: !!s.authMagicLinkSent,
+      authFormOpen: !s.authMagicLinkSent,
+      authErrorOpen: !!s.authError,
+      authErrorText: s.authError,
+      sendMagicLink: () => this.sendMagicLink(),
+      skipAuthClick: () => this.setSkipAuth(true),
+      hasSession: !!s.session,
+      signOut: () => this.signOut(),
+      localImportOpen: !!s.localImportPrompt,
+      localImportCount: s.localImportPrompt ? s.localImportPrompt.count : 0,
+      confirmLocalImport: () => this.confirmLocalImport(),
+      dismissLocalImport: () => this.dismissLocalImport(),
+      shareCampaign: () => this.shareCampaign(),
+      shareCampaignLabel: s.sharingCampaign ? 'Sharing…' : (this.activeCloudId() ? 'Copy invite link' : 'Share campaign'),
+      shareLinkCopied: !!s.shareLinkCopied,
+      joinErrorOpen: !!s.joinError,
+      joinErrorText: s.joinError,
+      dismissJoinError: () => this.setState({ joinError: '' }),
+      isRoster: !showAuthGate && (s.screen === 'roster' || !c) && s.screen !== 'party' && s.screen !== 'recaps' && s.screen !== 'compendium' && s.screen !== 'creatures',
+      isCompendium: !showAuthGate && s.screen === 'compendium',
       goCompendium: () => this.setState({ screen: 'compendium' }),
       goCompendiumMenu: () => this.setState({ screen: 'compendium', pagesOpen: false }),
-      isCreatures: s.screen === 'creatures',
+      isCreatures: !showAuthGate && s.screen === 'creatures',
       goCreatures: () => this.setState({ screen: 'creatures' }),
       goCreaturesMenu: () => this.setState({ screen: 'creatures', pagesOpen: false }),
       addCreature: () => this.upCreatures(list => list.push(this.defaultCreature())),
@@ -3301,7 +3650,7 @@ class Component extends DCLogic {
         };
       })),
       isSheet,
-      isParty: s.screen === 'party',
+      isParty: !showAuthGate && s.screen === 'party',
       goParty: () => this.setState({ screen: 'party' }),
       goPartyMenu: () => this.setState({ screen: 'party', pagesOpen: false }),
       partyList: (s.party || []).map(p => ({
@@ -3330,7 +3679,7 @@ class Component extends DCLogic {
         this.upParty(pl => pl.push(item));
         this.setState({ newPartyName: '', newPartyQty: '1', newPartyNote: '' });
       },
-      isRecaps: s.screen === 'recaps',
+      isRecaps: !showAuthGate && s.screen === 'recaps',
       goRecaps: () => this.setState({ screen: 'recaps' }),
       goRecapsMenu: () => this.setState({ screen: 'recaps', pagesOpen: false }),
       recapList: (s.recaps || []).map(r => ({

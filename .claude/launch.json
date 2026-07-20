@@ -1,0 +1,23 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "static",
+      "runtimeExecutable": "py",
+      "runtimeArgs": ["-m", "http.server", "8743"],
+      "port": 8743
+    },
+    {
+      "name": "dh-tracker-vite",
+      "runtimeExecutable": "C:\\Program Files\\nodejs\\node.exe",
+      "runtimeArgs": ["dh-tracker/node_modules/vite/bin/vite.js", "dh-tracker", "--port", "5174"],
+      "port": 5174
+    },
+    {
+      "name": "dh-tracker-preview",
+      "runtimeExecutable": "C:\\Program Files\\nodejs\\node.exe",
+      "runtimeArgs": ["dh-tracker/node_modules/vite/bin/vite.js", "preview", "dh-tracker", "--port", "5175"],
+      "port": 5175
+    }
+  ]
+}

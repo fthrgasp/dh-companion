@@ -8,16 +8,32 @@ see current state" is the accepted UX for shared data.
 
 This is a passion project. Prioritize clean, maintainable solutions over speed-hacks.
 
-## Current architecture (v0.9.0, as of last full audit)
+## Current architecture (v0.12.0, as of last full audit)
 
-**Not React.** A homegrown ~250-line template engine (`DcEngine`) baked into the
-single HTML file:
+**Not React.** A homegrown ~250-line template engine (`DcEngine`):
 - Handlebars-style `{{bindings}}`
 - `sc-if` conditionals, mustache-lite loops
-- `x-import` tag pulling in a hosted `image-slot` component for photo uploads
+- `x-import` tag rendering an inline `image-slot` widget for photo uploads
+  (self-contained in `core/dcEngine.js`, not an external dependency)
 - One `Component` class extending a tiny `DCLogic` base
 - `setState` triggers full re-paint, no diffing
-- Zero build step, zero dependencies — ugly under the hood, bulletproof to ship
+
+**Build step: Vite.** As of the `/dh-tracker` restructure, the app is a proper
+multi-file Vite project (`/dh-tracker/src/...`), not a single HTML file. This
+is a deliberate reversal of the earlier "zero build step, zero dependencies"
+stance — `npm install` + `npm run dev`/`build`/`preview` inside `/dh-tracker`.
+Layout: `core/` (template engine, state, undo, migrations, storage, supabase),
+`screens/` (one file per screen, owning both its mutation logic and its
+template-string markup), `features/` (character wizard, damage calculator).
+`renderVals()` itself stays one large method in `main.js` rather than split
+per-screen — the sheet-tab section is too tangled (shared `theme`/`accent`/`c`
+context across 10 tabs) to decompose cleanly without real risk; splitting
+methods and markup out of the monolith was the actual pain point, and that's
+done. Every `localStorage` call in the app funnels through `core/storage.js`
+(five generic primitives: `loadJSON`/`saveJSON`/`loadRaw`/`saveRaw`/`removeRaw`)
+— no other file touches `localStorage` directly.
+The original single-file `Daggerheart_Tracker.html` is kept at the repo root
+as a fallback, not actively maintained; treat `/dh-tracker` as the live app.
 
 **State model:** one big `state` object, no Redux/Context.
 - Nav: `screen` (roster/sheet/compendium/creatures/party/recaps), `activeId`, `tab`
@@ -57,28 +73,38 @@ save slots and theme per slot, switchable via a game-menu dropdown.
   (Blood, Dread), 6 ancestries, 6 communities — covered under the DPCGL
   (Darrington Press Community Gaming License) for non-commercial use
 
-## What's genuinely missing (the only real gap)
-1. **Multi-user support**
-2. **Persistent database storage**
-
-Everything else in the app is refinement, not a rebuild. The state schema is
-already shaped in a way that should port to a real backend with minimal
-redesign — swapping `localStorage` calls for API calls is the bulk of the work,
-not a data model overhaul.
-
-## Agreed target architecture (not yet built)
-- **Backend:** Supabase (Postgres + auth + REST API)
-- **Hosting:** Vercel or Netlify, free tier
+## Multi-user / persistent storage — Supabase, in progress
+- **Backend:** Supabase (Postgres + auth + REST API). Project: "Daggerheart
+  Character Tracker" (ref `rrflddwsjxeajyldmwrh`).
+- **Hosting:** Vercel or Netlify, free tier (not yet deployed anywhere — still
+  local dev).
 - **No realtime sync** — explicitly ruled out as unnecessary for a physical-table
-  group; refresh-based state is the right tradeoff
-- Raw AWS was considered and rejected as overkill for a zero-cost, low-traffic,
-  small-group app
+  group; refresh-based state is the right tradeoff.
+- Supabase JS client loaded via CDN `<script>` tag (not an npm dependency) —
+  deliberate, to keep the Supabase integration itself a "pure addition" not
+  tied to bundler-specific version resolution.
 
-## Agreed build order
-1. Auth + character sheet CRUD (solves the immediate cross-device problem)
-2. Shared inventory with row-locking for concurrency + permission logic
-3. GM dashboard view (GM sees all party sheets; players see only their own;
-   GM-only NPC roster)
+## Build order
+1. **Shipped.** Auth (magic-link email, `core/supabase.js`) + character sheet
+   CRUD (`characters` table, RLS by `owner_id`). Signing out / never signing in
+   still works fully offline — local-first is the fallback, not a special case.
+2. **Shipped.** Shared inventory (`party_items` table). Required building out a
+   real "shared campaign" concept from scratch (`games` + `game_members`
+   tables) since `games[]`/`activeGame` was previously 100% client-local with
+   no way for two devices to agree on the same campaign. Join model: shareable
+   link (anyone with the link auto-joins on sign-in, no approval step).
+   Permissions: anyone in the campaign can edit anything. Concurrency:
+   last-write-wins (chosen over per-row version-checking as unnecessary
+   complexity at this table size).
+3. **Not started — scope discussed, not finalized.** GM dashboard view: GM
+   sees every party member's full character sheet, players see only their own
+   full sheet **but everyone sees everyone's roster-card summary** (name/HP/
+   stress/class/level) — this last part is a deliberate addition beyond the
+   original "players see only their own" framing. **Creatures/bestiary is
+   explicitly NOT going GM-only** (a deliberate departure from earlier
+   framing) — it becomes a shared resource like Party inventory, same
+   "anyone can edit anything" model, its own Supabase table mirroring
+   `party_items`.
 4. Homebrew-specific features
 
 ## Hard rules / non-negotiables
@@ -92,6 +118,7 @@ not a data model overhaul.
 ## Working style
 - Direct, no-fluff. Skip the preamble.
 - Flag genuine uncertainty rather than guessing/fabricating.
-- Verify JS changes with `node --check` on extracted script blocks (was
-  previously a single-file HTML, so may need extraction) or normal lint/build
-  tooling once the repo is properly modularized.
+- Verify JS changes with `node --check` per file, plus `npm run build` inside
+  `/dh-tracker` for a full production-build sanity check. Verify UI changes by
+  running `npm run dev` inside `/dh-tracker` (Vite dev server) and checking in
+  a browser — don't rely on syntax checks alone for behavior.

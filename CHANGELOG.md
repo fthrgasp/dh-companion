@@ -2,6 +2,11 @@
 
 All notable changes to the Daggerheart Tracker are logged here. Format loosely follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [0.12.1] — 2026-07-20
+
+### Fixed
+- **Magic-link sign-in redirected to a dead local dev server instead of back to the app.** Left over from testing the Supabase auth flow locally — the project's Site URL was still pointed at `localhost`, so every magic link (on any device) redirected there regardless of where it was actually requested from. `sendMagicLink()` now explicitly passes the current page's own URL as the redirect target on every request, so it's correct automatically in any environment (local dev, GitHub Pages, anywhere else this ever gets deployed) without needing the Supabase dashboard's Site URL to be flipped per environment.
+
 ## [0.12.0] — 2026-07-19
 
 ### Changed

@@ -1961,7 +1961,7 @@ CARD: ...</pre>
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
-const APP_VERSION = '0.12.0';
+const APP_VERSION = '0.12.1';
 
 // Publishable (anon) key — safe to expose client-side; row-level security on
 // the `characters` table is the actual access boundary, not this key.
@@ -2216,7 +2216,7 @@ class Component extends DCLogic {
     if (!supabaseClient) { this.setState({ authError: 'Supabase failed to load — check your connection.' }); return; }
     const email = (this.state.authEmail || '').trim();
     if (!email) return;
-    supabaseClient.auth.signInWithOtp({ email }).then(({ error }) => {
+    supabaseClient.auth.signInWithOtp({ email, options: { emailRedirectTo: location.origin + location.pathname } }).then(({ error }) => {
       if (error) this.setState({ authError: error.message });
       else this.setState({ authMagicLinkSent: true, authError: '' });
     });

@@ -14,7 +14,7 @@ does, with no install and no account required. Optionally sign in with a magic-l
 email to sync your characters and a campaign's shared inventory across devices; skip
 that and it works exactly as a local-only, no-account tool.
 
-**Current version:** `0.12.0` — also shown live in the app itself, top-left of the Party Roster
+**Current version:** `0.12.1` — also shown live in the app itself, top-left of the Party Roster
 screen. Compare that number to the [changelog](#changelog) below to see if the copy hosted
 on GitHub Pages is up to date. The app also checks for updates itself (see
 "Keeping deployed copies current" below) and will tell you directly if it's stale.
@@ -98,6 +98,14 @@ version string. If you forget to update `version.json`, nothing breaks; the bann
 just won't show up until it's fixed.
 
 ## Changelog
+[0.12.1] — 2026-07-20
+
+Fixed
+
+- Magic-link sign-in was redirecting to a local dev server left over from
+  testing instead of back to the app. Now uses whatever URL the request
+  actually came from, so it's correct on any device automatically.
+
 [0.12.0] — 2026-07-19
 
 Changed

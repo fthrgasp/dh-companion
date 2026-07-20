@@ -58,7 +58,7 @@ export const supabaseMixin = {
     if (!supabaseClient) { this.setState({ authError: 'Supabase failed to load — check your connection.' }); return; }
     const email = (this.state.authEmail || '').trim();
     if (!email) return;
-    supabaseClient.auth.signInWithOtp({ email }).then(({ error }) => {
+    supabaseClient.auth.signInWithOtp({ email, options: { emailRedirectTo: location.origin + location.pathname } }).then(({ error }) => {
       if (error) this.setState({ authError: error.message });
       else this.setState({ authMagicLinkSent: true, authError: '' });
     });

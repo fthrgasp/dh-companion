@@ -41,6 +41,7 @@ class Component extends DCLogic {
 
     const dark = !!s.dark;
     try { document.body.style.background = dark ? '#1c1a16' : '#f2efe9'; } catch (e) {}
+    try { document.body.classList.toggle('fonts-off', !!s.fontsOff); } catch (e) {}
     const theme = dark
       ? { bg: '#1c1a16', panel: '#26241f', border: '#3a362d', border2: '#4a4438', text: '#ece7dc', muted: '#a89f8d', inputBg: '#2f2c25', border3: '#332f27', trackBg: '#3a362d', highlightBg: '#3d3624', majorBg: '#3d3624', severeBg: '#3d2b28', companionBg: '#243024', companionBorder: '#33452f' }
       : { bg: '#f2efe9', panel: '#ffffff', border: '#e2dcd0', border2: '#d5ccba', text: '#26221b', muted: '#8a8172', inputBg: '#faf7f1', border3: '#f1ece2', trackBg: '#eee7da', highlightBg: '#f4ead9', majorBg: '#f4ead9', severeBg: '#f2ddd6', companionBg: '#eef3ea', companionBorder: '#d7e2d0' };
@@ -61,6 +62,9 @@ class Component extends DCLogic {
       dark,
       toggleDark: () => this.toggleDark(),
       darkLabel: dark ? '☀ Light' : '☾ Dark',
+      fontsOff: !!s.fontsOff,
+      toggleFontsOff: () => this.toggleFontsOff(),
+      fontsOffLabel: s.fontsOff ? 'Decorative fonts: off' : 'Decorative fonts: on',
       exportMenuOpen: !!s.exportMenuOpen,
       toggleExportMenu: () => this.setState({ exportMenuOpen: !s.exportMenuOpen }),
       exportPdf: () => { this.setState({ exportMenuOpen: false }); window.print(); },

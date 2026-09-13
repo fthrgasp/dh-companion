@@ -314,7 +314,7 @@ export const rosterTemplate = `
   </sc-if>
   <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;border-bottom:2px solid var(--text);padding-bottom:14px;margin-bottom:8px">
     <div style="display:flex;align-items:baseline;gap:14px;flex-shrink:0">
-      <h1 style="font-family:'Spectral',serif;font-weight:600;font-size:34px;margin:0;letter-spacing:-0.01em;white-space:nowrap;flex-shrink:0">Party Roster</h1>
+      <h1 style="font-family:var(--font-flavor);font-weight:600;font-size:calc(34px * var(--scale-flavor));margin:0;letter-spacing:-0.01em;white-space:nowrap;flex-shrink:0">Party Roster</h1>
       <span style="font-size:13px;color:var(--muted);letter-spacing:0.08em;text-transform:uppercase;white-space:nowrap">Daggerheart</span>
       <span title="Build version — check the README changelog to see if a newer one is available" style="font-size:10.5px;color:var(--muted);background:var(--panel);border:1px solid var(--border2);border-radius:999px;padding:2px 8px;white-space:nowrap">{{appVersion}}</span>
     </div>
@@ -352,6 +352,9 @@ export const rosterTemplate = `
             <div style="flex:1"></div>
             <button sc-camel-on-click="{{toggleDark}}" style="border:1px solid var(--border2);background:var(--panel);color:var(--text);border-radius:7px;padding:6px 10px;font-size:12px;cursor:pointer">{{darkLabel}}</button>
           </div>
+          <div style="padding:2px 8px 6px">
+            <button sc-camel-on-click="{{toggleFontsOff}}" title="Device-only — doesn't sync to your account or other players" style="width:100%;border:1px solid var(--border2);background:var(--panel);color:var(--text);border-radius:7px;padding:6px 10px;font-size:12px;cursor:pointer;font-family:var(--font-chrome);text-align:left">{{fontsOffLabel}}</button>
+          </div>
           <div style="height:1px;background:var(--border3);margin:6px 4px"></div>
           <div style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);padding:4px 8px">Roster background</div>
           <div style="display:flex;gap:6px;padding:2px 8px 6px;flex-wrap:wrap">
@@ -379,14 +382,14 @@ export const rosterTemplate = `
     </div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
       <div style="display:flex;align-items:center;gap:8px;border:1px solid var(--border2);background:var(--panel);border-radius:8px;padding:6px 6px 6px 12px">
-        <span style="font-family:'Spectral',serif;font-size:15px;font-weight:600;min-width:52px">{{sessionTimeTxt}}</span>
+        <span style="font-family:var(--font-flavor);font-size:calc(15px * var(--scale-flavor));font-weight:600;min-width:52px">{{sessionTimeTxt}}</span>
         <button sc-camel-on-click="{{sessionToggle}}" style="width:28px;height:28px;border:none;background:var(--highlight-bg);color:var(--text);border-radius:6px;cursor:pointer;font-size:12px">{{sessionToggleLabel}}</button>
         <button sc-camel-on-click="{{sessionReset}}" style="width:28px;height:28px;border:none;background:none;color:var(--muted);cursor:pointer;font-size:13px" style-hover="color:#A33B3B">↻</button>
       </div>
-      <button sc-camel-on-click="{{goParty}}" style="border:1px solid var(--border2);background:var(--panel);color:var(--text);border-radius:8px;padding:8px 14px;font-size:13px;cursor:pointer" style-hover="border-color:var(--text)">Shared Inventory</button>
-      <button sc-camel-on-click="{{goRecaps}}" style="border:1px solid var(--border2);background:var(--panel);color:var(--text);border-radius:8px;padding:8px 14px;font-size:13px;cursor:pointer" style-hover="border-color:var(--text)">Session Recaps</button>
-      <button sc-camel-on-click="{{goCompendium}}" style="border:1px solid var(--border2);background:var(--panel);color:var(--text);border-radius:8px;padding:8px 14px;font-size:13px;cursor:pointer" style-hover="border-color:var(--text)">Companion Compendium</button>
-      <button sc-camel-on-click="{{goCreatures}}" style="border:1px solid var(--border2);background:var(--panel);color:var(--text);border-radius:8px;padding:8px 14px;font-size:13px;cursor:pointer" style-hover="border-color:var(--text)">Creatures</button>
+      <button sc-camel-on-click="{{goParty}}" style="border:1px solid var(--border2);background:var(--panel);color:var(--text);border-radius:8px;padding:8px 14px;font-size:13px;cursor:pointer;font-family:var(--font-chrome)" style-hover="border-color:var(--text)">Shared Inventory</button>
+      <button sc-camel-on-click="{{goRecaps}}" style="border:1px solid var(--border2);background:var(--panel);color:var(--text);border-radius:8px;padding:8px 14px;font-size:13px;cursor:pointer;font-family:var(--font-chrome)" style-hover="border-color:var(--text)">Session Recaps</button>
+      <button sc-camel-on-click="{{goCompendium}}" style="border:1px solid var(--border2);background:var(--panel);color:var(--text);border-radius:8px;padding:8px 14px;font-size:13px;cursor:pointer;font-family:var(--font-chrome)" style-hover="border-color:var(--text)">Companion Compendium</button>
+      <button sc-camel-on-click="{{goCreatures}}" style="border:1px solid var(--border2);background:var(--panel);color:var(--text);border-radius:8px;padding:8px 14px;font-size:13px;cursor:pointer;font-family:var(--font-chrome)" style-hover="border-color:var(--text)">Creatures</button>
     </div>
   </div>
   <p style="font-size:13px;color:var(--muted);margin:0 0 24px">Tap a character to open their sheet.</p>
@@ -396,10 +399,10 @@ export const rosterTemplate = `
         <button sc-camel-on-click="{{rc.askDelete}}" title="Remove character" style="position:absolute;top:12px;right:12px;width:24px;height:24px;border:none;background:none;color:#b3ab9d;cursor:pointer;font-size:14px;line-height:1;z-index:1" style-hover="color:#A33B3B">✕</button>
         <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px">
           <div>
-            <div style="font-family:'Spectral',serif;font-size:22px;font-weight:600">{{rc.name}}</div>
-            <div style="font-size:12.5px;color:var(--muted);margin-top:2px">{{rc.sub}}</div>
+            <div style="font-family:var(--font-body);font-size:calc(22px * var(--scale-body));font-weight:600">{{rc.name}}</div>
+            <div style="font-family:var(--font-body);font-size:calc(12.5px * var(--scale-body));color:var(--muted);margin-top:2px">{{rc.sub}}</div>
           </div>
-          <div style="flex:none;width:34px;height:34px;border-radius:8px;background:var(--accent,#8C5A2B);color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Spectral',serif;font-weight:600;font-size:16px">{{rc.level}}</div>
+          <div style="flex:none;width:34px;height:34px;border-radius:8px;background:var(--accent,#8C5A2B);color:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--font-flavor);font-weight:600;font-size:calc(16px * var(--scale-flavor))">{{rc.level}}</div>
         </div>
         <div style="display:flex;gap:16px;margin-top:16px;font-size:11px;color:var(--muted);letter-spacing:0.06em;text-transform:uppercase">
           <div style="flex:1"><div style="margin-bottom:4px">HP {{rc.hpTxt}}</div><div style="height:6px;border-radius:3px;background:var(--track-bg);overflow:hidden"><div style="height:100%;background:#A33B3B;width:{{rc.hpPct}}"></div></div></div>
@@ -453,7 +456,7 @@ export const importConflictModalTemplate = `
 <sc-if value="{{importConflictOpen}}" hint-placeholder-val="{{ false }}">
   <div style="position:fixed;inset:0;background:rgba(20,18,14,0.45);display:flex;align-items:center;justify-content:center;z-index:250;padding:20px">
     <div style="background:var(--panel);border-radius:16px;width:100%;max-width:480px;max-height:86vh;overflow:auto;padding:26px 28px;box-shadow:0 20px 50px rgba(0,0,0,0.25)">
-      <div style="font-family:'Spectral',serif;font-size:19px;font-weight:600;margin-bottom:8px">A character named "{{importConflictName}}" already exists</div>
+      <div style="font-family:var(--font-flavor);font-size:calc(19px * var(--scale-flavor));font-weight:600;margin-bottom:8px">A character named "{{importConflictName}}" already exists</div>
       <p style="font-size:13.5px;color:var(--muted);margin:0 0 16px;line-height:1.5">Cancel to back out, import as a separate new character, or merge the imported fields into the existing one.</p>
       <sc-if value="{{importMergeDiffHasLines}}" hint-placeholder-val="{{ false }}">
         <div style="border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:16px;display:flex;flex-direction:column;gap:4px">

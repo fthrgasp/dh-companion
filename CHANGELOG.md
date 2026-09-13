@@ -2,6 +2,12 @@
 
 All notable changes to the Daggerheart Tracker are logged here. Format loosely follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [0.12.2] — 2026-09-12
+
+### Added
+- **Two custom Thessamere typefaces** ("Old Hand" for names/numbers/titles, "Common Hand" for short labels/tags/recap prose) for flavor, loaded via `@font-face` and driven by new `--font-flavor`/`--font-body`/`--font-chrome` CSS variables with per-context scale multipliers. Small/fixed-width UI chrome (nav, card rules text) and anything read at length stays on the plain chrome font at normal size — the script faces are for short, glanceable text only.
+- **"Decorative fonts" toggle** in Options (roster screen), next to Theme. Single on/off switch (not per-font) that falls back all three font variables to the chrome font and resets scales to 1x. Stored in `localStorage` only — a per-device reading preference, not synced to the account or shared with other players at the table.
+
 ## [0.12.1] — 2026-07-20
 
 ### Fixed

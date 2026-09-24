@@ -45,7 +45,6 @@ var SKIP_ATTRS = {
   'component-from-global-scope': 1,
   'from': 1,
   'as': 1,
-  'list': 1,
   'value': 1,
   'checked': 1,
   'disabled': 1,

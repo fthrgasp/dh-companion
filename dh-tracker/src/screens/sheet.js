@@ -48,9 +48,24 @@ export const sheetMixin = {
     const c = this.active();
     if (!c) return [];
     const list = c[listKey] || [];
+    const table = this.weaponTable();
     return list.map((w, i) => ({
       equipped: { val: !!w.equipped, on: () => this.up(ch => { ch[listKey][i].equipped = !ch[listKey][i].equipped; }) },
-      name: { val: w.name, on: e => this.up(ch => { ch[listKey][i].name = e.target.value; }) },
+      // Typing (or picking, via the shared <datalist>) the exact name of a
+      // known weapon pulls its range/damage from the table instead of
+      // leaving new rows stuck on the "Melee" default with blank damage.
+      name: {
+        val: w.name,
+        on: e => this.up(ch => {
+          const val = e.target.value;
+          ch[listKey][i].name = val;
+          const known = table.find(t => t.name.toLowerCase() === val.trim().toLowerCase());
+          if (known) {
+            ch[listKey][i].range = known.range;
+            ch[listKey][i].damage = known.damage;
+          }
+        })
+      },
       range: { val: w.range, on: e => this.up(ch => { ch[listKey][i].range = e.target.value; }) },
       damage: { val: w.damage, on: e => this.up(ch => { ch[listKey][i].damage = e.target.value; }) },
       remove: () => this.up(ch => ch[listKey].splice(i, 1)),
@@ -325,6 +340,33 @@ export const sheetTemplate = `
             <div style="flex:1">
               <div style="display:flex;gap:10px;align-items:baseline;flex-wrap:wrap"><span style="font-family:var(--font-flavor);font-size:calc(17px * var(--scale-flavor));font-weight:600">{{cd.name}}</span><span style="font-family:var(--font-body);font-size:calc(11.5px * var(--scale-body));color:var(--muted);letter-spacing:0.05em;text-transform:uppercase">{{cd.meta}}</span></div>
               <div style="font-family:var(--font-chrome);font-size:13.5px;color:#4d463a;margin-top:4px;line-height:1.45">{{cd.text}}</div>
+              <div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border3)">
+                <sc-if value="{{cd.tokensOff}}" hint-placeholder-val="{{ true }}">
+                  <button sc-camel-on-click="{{cd.toggleTokens}}" style="border:1px dashed var(--border2);background:none;color:var(--muted);border-radius:7px;padding:4px 10px;font-size:11.5px;cursor:pointer;font-family:var(--font-chrome)" style-hover="border-color:var(--accent,#8C5A2B);color:var(--accent,#8C5A2B)">+ Track tokens</button>
+                </sc-if>
+                <sc-if value="{{cd.tokensOn}}" hint-placeholder-val="{{ false }}">
+                  <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:11.5px;font-family:var(--font-chrome)">
+                    <span style="letter-spacing:0.06em;text-transform:uppercase;color:var(--muted)">Tokens</span>
+                    <sc-raw-select value="{{cd.tokenMode}}" sc-camel-on-change="{{cd.setTokenMode}}" style="border:1px solid var(--border2);border-radius:6px;padding:3px 5px;font-size:11px;background:var(--input-bg)">
+                      <option value="fixed">Fixed</option><option value="trait">By trait</option>
+                    </sc-raw-select>
+                    <sc-if value="{{cd.tokenModeIsTrait}}" hint-placeholder-val="{{ false }}">
+                      <sc-raw-select value="{{cd.tokenTrait}}" sc-camel-on-change="{{cd.setTokenTrait}}" style="border:1px solid var(--border2);border-radius:6px;padding:3px 5px;font-size:11px;background:var(--input-bg)">
+                        <option value="Agility">Agility</option><option value="Strength">Strength</option><option value="Finesse">Finesse</option><option value="Instinct">Instinct</option><option value="Presence">Presence</option><option value="Knowledge">Knowledge</option>
+                      </sc-raw-select>
+                    </sc-if>
+                    <sc-if value="{{cd.tokenModeIsFixed}}" hint-placeholder-val="{{ true }}">
+                      <input type="number" value="{{cd.tokenFixed}}" sc-camel-on-change="{{cd.setTokenFixed}}" style="width:44px;border:1px solid var(--border2);border-radius:6px;padding:3px 5px;font-size:11px;background:var(--input-bg)">
+                    </sc-if>
+                    <div style="flex:1"></div>
+                    <button sc-camel-on-click="{{cd.tokenDec}}" style="width:22px;height:22px;border:1px solid var(--border2);background:var(--panel);border-radius:6px;cursor:pointer;font-size:13px;line-height:1;padding:0">−</button>
+                    <span style="font-weight:600;min-width:38px;text-align:center">{{cd.tokenCount}} / {{cd.tokenMax}}</span>
+                    <button sc-camel-on-click="{{cd.tokenInc}}" style="width:22px;height:22px;border:1px solid var(--border2);background:var(--panel);border-radius:6px;cursor:pointer;font-size:13px;line-height:1;padding:0">+</button>
+                    <button sc-camel-on-click="{{cd.tokenReset}}" style="border:none;background:none;color:var(--muted);cursor:pointer;font-size:11px" style-hover="color:var(--text)">Reset</button>
+                    <button sc-camel-on-click="{{cd.toggleTokens}}" title="Stop tracking tokens" style="border:none;background:none;color:var(--muted);cursor:pointer;font-size:12px" style-hover="color:#A33B3B">✕</button>
+                  </div>
+                </sc-if>
+              </div>
             </div>
             <button sc-camel-on-click="{{cd.move}}" style="flex:none;border:1px solid var(--border2);background:var(--panel);border-radius:8px;padding:6px 12px;font-size:12px;cursor:pointer;color:var(--muted)" style-hover="border-color:var(--text);color:var(--text)">To vault</button>
           </div>
@@ -340,6 +382,33 @@ export const sheetTemplate = `
             <div style="flex:1">
               <div style="display:flex;gap:10px;align-items:baseline;flex-wrap:wrap"><span style="font-family:var(--font-flavor);font-size:calc(16px * var(--scale-flavor));font-weight:600">{{cd.name}}</span><span style="font-family:var(--font-body);font-size:calc(11.5px * var(--scale-body));color:var(--muted);letter-spacing:0.05em;text-transform:uppercase">{{cd.meta}}</span></div>
               <div style="font-family:var(--font-chrome);font-size:13px;color:#4d463a;margin-top:4px;line-height:1.45">{{cd.text}}</div>
+              <div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border3)">
+                <sc-if value="{{cd.tokensOff}}" hint-placeholder-val="{{ true }}">
+                  <button sc-camel-on-click="{{cd.toggleTokens}}" style="border:1px dashed var(--border2);background:none;color:var(--muted);border-radius:7px;padding:4px 10px;font-size:11.5px;cursor:pointer;font-family:var(--font-chrome)" style-hover="border-color:var(--accent,#8C5A2B);color:var(--accent,#8C5A2B)">+ Track tokens</button>
+                </sc-if>
+                <sc-if value="{{cd.tokensOn}}" hint-placeholder-val="{{ false }}">
+                  <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:11.5px;font-family:var(--font-chrome)">
+                    <span style="letter-spacing:0.06em;text-transform:uppercase;color:var(--muted)">Tokens</span>
+                    <sc-raw-select value="{{cd.tokenMode}}" sc-camel-on-change="{{cd.setTokenMode}}" style="border:1px solid var(--border2);border-radius:6px;padding:3px 5px;font-size:11px;background:var(--input-bg)">
+                      <option value="fixed">Fixed</option><option value="trait">By trait</option>
+                    </sc-raw-select>
+                    <sc-if value="{{cd.tokenModeIsTrait}}" hint-placeholder-val="{{ false }}">
+                      <sc-raw-select value="{{cd.tokenTrait}}" sc-camel-on-change="{{cd.setTokenTrait}}" style="border:1px solid var(--border2);border-radius:6px;padding:3px 5px;font-size:11px;background:var(--input-bg)">
+                        <option value="Agility">Agility</option><option value="Strength">Strength</option><option value="Finesse">Finesse</option><option value="Instinct">Instinct</option><option value="Presence">Presence</option><option value="Knowledge">Knowledge</option>
+                      </sc-raw-select>
+                    </sc-if>
+                    <sc-if value="{{cd.tokenModeIsFixed}}" hint-placeholder-val="{{ true }}">
+                      <input type="number" value="{{cd.tokenFixed}}" sc-camel-on-change="{{cd.setTokenFixed}}" style="width:44px;border:1px solid var(--border2);border-radius:6px;padding:3px 5px;font-size:11px;background:var(--input-bg)">
+                    </sc-if>
+                    <div style="flex:1"></div>
+                    <button sc-camel-on-click="{{cd.tokenDec}}" style="width:22px;height:22px;border:1px solid var(--border2);background:var(--panel);border-radius:6px;cursor:pointer;font-size:13px;line-height:1;padding:0">−</button>
+                    <span style="font-weight:600;min-width:38px;text-align:center">{{cd.tokenCount}} / {{cd.tokenMax}}</span>
+                    <button sc-camel-on-click="{{cd.tokenInc}}" style="width:22px;height:22px;border:1px solid var(--border2);background:var(--panel);border-radius:6px;cursor:pointer;font-size:13px;line-height:1;padding:0">+</button>
+                    <button sc-camel-on-click="{{cd.tokenReset}}" style="border:none;background:none;color:var(--muted);cursor:pointer;font-size:11px" style-hover="color:var(--text)">Reset</button>
+                    <button sc-camel-on-click="{{cd.toggleTokens}}" title="Stop tracking tokens" style="border:none;background:none;color:var(--muted);cursor:pointer;font-size:12px" style-hover="color:#A33B3B">✕</button>
+                  </div>
+                </sc-if>
+              </div>
             </div>
             <button sc-camel-on-click="{{cd.move}}" style="flex:none;border:1px solid var(--border2);background:var(--panel);border-radius:8px;padding:6px 12px;font-size:12px;cursor:pointer" style-hover="border-color:var(--text)">Equip</button>
           </div>
@@ -435,13 +504,18 @@ CARD: ...</pre>
     <div style="flex:1;min-width:300px;display:flex;flex-direction:column;gap:16px">
       <div style="background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:18px 20px">
         <div style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:10px">Weapons</div>
+        <datalist id="weapon-table-datalist">
+          <sc-for list="{{weaponTableOptions}}" as="wt" hint-placeholder-count="3">
+            <option value="{{wt.name}}"></option>
+          </sc-for>
+        </datalist>
         <div style="font-size:11px;color:var(--muted);margin-bottom:8px">Primary</div>
         <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:8px">
           <sc-for list="{{primaryWeapons}}" as="pw" hint-placeholder-count="1">
             <div style="border:1px solid var(--border3);border-radius:10px;padding:10px 12px">
               <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
                 <label style="display:flex;align-items:center;gap:5px;font-size:11.5px;color:var(--muted);cursor:pointer"><input type="checkbox" checked="{{pw.equipped.val}}" sc-camel-on-change="{{pw.equipped.on}}">Equipped</label>
-                <input value="{{pw.name.val}}" sc-camel-on-change="{{pw.name.on}}" placeholder="Weapon name" style="flex:2;min-width:110px;border:1px solid var(--border2);border-radius:8px;padding:7px 9px;font-size:13.5px;background:var(--input-bg)">
+                <input value="{{pw.name.val}}" sc-camel-on-change="{{pw.name.on}}" placeholder="Weapon name" list="weapon-table-datalist" style="flex:2;min-width:110px;border:1px solid var(--border2);border-radius:8px;padding:7px 9px;font-size:13.5px;background:var(--input-bg)">
                 <sc-raw-select value="{{pw.range.val}}" sc-camel-on-change="{{pw.range.on}}" style="border:1px solid var(--border2);border-radius:8px;padding:7px;font-size:13px;background:var(--input-bg)">
                   <option value="Melee">Melee</option><option value="Very Close">Very Close</option><option value="Close">Close</option><option value="Far">Far</option><option value="Very Far">Very Far</option>
                 </sc-raw-select>
@@ -469,7 +543,7 @@ CARD: ...</pre>
             <div style="border:1px solid var(--border3);border-radius:10px;padding:10px 12px">
               <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
                 <label style="display:flex;align-items:center;gap:5px;font-size:11.5px;color:var(--muted);cursor:pointer"><input type="checkbox" checked="{{sw.equipped.val}}" sc-camel-on-change="{{sw.equipped.on}}">Equipped</label>
-                <input value="{{sw.name.val}}" sc-camel-on-change="{{sw.name.on}}" placeholder="Weapon name" style="flex:2;min-width:110px;border:1px solid var(--border2);border-radius:8px;padding:7px 9px;font-size:13.5px;background:var(--input-bg)">
+                <input value="{{sw.name.val}}" sc-camel-on-change="{{sw.name.on}}" placeholder="Weapon name" list="weapon-table-datalist" style="flex:2;min-width:110px;border:1px solid var(--border2);border-radius:8px;padding:7px 9px;font-size:13.5px;background:var(--input-bg)">
                 <sc-raw-select value="{{sw.range.val}}" sc-camel-on-change="{{sw.range.on}}" style="border:1px solid var(--border2);border-radius:8px;padding:7px;font-size:13px;background:var(--input-bg)">
                   <option value="Melee">Melee</option><option value="Very Close">Very Close</option><option value="Close">Close</option><option value="Far">Far</option><option value="Very Far">Very Far</option>
                 </sc-raw-select>

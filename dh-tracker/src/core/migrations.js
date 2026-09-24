@@ -110,7 +110,6 @@ export const migrationsMixin = {
       downtime: { moves: this.defaultDowntimeMoves(), project: { name: '', progress: 0, max: 6 } },
       conditions: this.defaultConditions(),
       shortRest: { moves: this.defaultShortRestMoves() },
-      weapons: this.defaultWeapons(),
       weaponsPrimary: [], weaponsSecondary: [],
       equippedArmor: { name: '', score: 3 }
     };
@@ -125,17 +124,24 @@ export const migrationsMixin = {
     if (!c.downtime) c.downtime = { moves: this.defaultDowntimeMoves(), project: { name: '', progress: 0, max: 6 } };
     if (!c.conditions) c.conditions = this.defaultConditions();
     if (!c.shortRest) c.shortRest = { moves: this.defaultShortRestMoves() };
-    if (!c.weapons) c.weapons = this.defaultWeapons();
-    if (!c.weaponsPrimary) {
-      c.weaponsPrimary = (c.weapons.primary && c.weapons.primary.name)
-        ? [{ name: c.weapons.primary.name, range: c.weapons.primary.range || 'Melee', damage: c.weapons.primary.damage || '', equipped: true, features: [] }]
-        : [];
+    // One-time upgrade from the old single-weapon `weapons` shape to the
+    // weaponsPrimary/weaponsSecondary lists — then drop `weapons` entirely so
+    // it can't keep sitting there as stale ghost data (e.g. still showing
+    // "Dagger" forever) once the real lists have moved on without it.
+    if (!c.weaponsPrimary || !c.weaponsSecondary) {
+      const legacy = c.weapons || this.defaultWeapons();
+      if (!c.weaponsPrimary) {
+        c.weaponsPrimary = (legacy.primary && legacy.primary.name)
+          ? [{ name: legacy.primary.name, range: legacy.primary.range || 'Melee', damage: legacy.primary.damage || '', equipped: true, features: [] }]
+          : [];
+      }
+      if (!c.weaponsSecondary) {
+        c.weaponsSecondary = (legacy.secondaryEnabled && legacy.secondary && legacy.secondary.name)
+          ? [{ name: legacy.secondary.name, range: legacy.secondary.range || 'Melee', damage: legacy.secondary.damage || '', equipped: true, features: [] }]
+          : [];
+      }
     }
-    if (!c.weaponsSecondary) {
-      c.weaponsSecondary = (c.weapons.secondaryEnabled && c.weapons.secondary && c.weapons.secondary.name)
-        ? [{ name: c.weapons.secondary.name, range: c.weapons.secondary.range || 'Melee', damage: c.weapons.secondary.damage || '', equipped: true, features: [] }]
-        : [];
-    }
+    delete c.weapons;
     if (!c.equippedArmor) c.equippedArmor = { name: '', score: c.armorScore || 3 };
     if (!c.companions) { c.companions = c.companion ? [c.companion] : []; c.activeCompanion = 0; }
     if (c.activeCompanion == null) c.activeCompanion = 0;

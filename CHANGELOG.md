@@ -2,6 +2,11 @@
 
 All notable changes to the Daggerheart Tracker are logged here. Format loosely follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [0.12.4] — 2026-09-24
+
+### Changed
+- **Conditions moved to the bottom of the Play tab's left column.** It was the first box, above Evasion/Armor/Proficiency, thresholds, and traits, which pushed the stats you check most often further down the sheet. Evasion/Armor/Prof, Traits, and Experiences each move up one slot.
+
 ## [0.12.3] — 2026-09-24
 
 ### Added

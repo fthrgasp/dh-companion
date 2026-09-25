@@ -156,23 +156,6 @@ export const sheetTemplate = `
     <!-- Column A: stats -->
     <div style="flex:1;min-width:290px;display:flex;flex-direction:column;gap:16px">
       <div style="background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:18px 20px">
-        <div style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:10px">Conditions</div>
-        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px" data-print-hide="1">
-          <sc-for list="{{conditionList}}" as="cd2" hint-placeholder-count="3">
-            <div style="display:inline-flex;align-items:center;gap:6px;border:1px solid {{cd2.bc}};background:{{cd2.bg}};color:{{cd2.fg}};border-radius:999px;padding:6px 6px 6px 14px;font-size:12.5px;cursor:pointer" title="{{cd2.desc}}">
-              <span sc-camel-on-click="{{cd2.toggle}}">{{cd2.name}}</span>
-              <sc-if value="{{cd2.removable}}" hint-placeholder-val="{{ false }}">
-                <button sc-camel-on-click="{{cd2.remove}}" style="border:none;background:none;color:inherit;opacity:0.6;cursor:pointer;font-size:12px;padding:0 2px">✕</button>
-              </sc-if>
-            </div>
-          </sc-for>
-        </div>
-        <div style="display:flex;gap:6px" data-print-hide="1">
-          <input value="{{newConditionName}}" sc-camel-on-change="{{setNewConditionName}}" placeholder="Custom condition" style="flex:1;border:1px solid var(--border2);border-radius:8px;padding:7px 10px;font-size:13px;background:var(--input-bg)">
-          <button sc-camel-on-click="{{addCondition}}" style="border:1px solid var(--border2);background:var(--panel);color:var(--text);border-radius:8px;padding:7px 14px;font-size:13px;cursor:pointer" style-hover="border-color:var(--text)">Add</button>
-        </div>
-      </div>
-      <div style="background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:18px 20px">
         <div style="display:flex;gap:10px">
           <div style="flex:1;text-align:center;border:1px solid var(--border);border-radius:10px;padding:10px 6px"><div style="font-family:var(--font-body);font-size:calc(10px * var(--scale-body));letter-spacing:0.1em;text-transform:uppercase;color:var(--muted)">Evasion</div><div style="font-family:var(--font-flavor);font-size:calc(26px * var(--scale-flavor));font-weight:600">{{c.evasion}}</div></div>
           <div style="flex:1;text-align:center;border:1px solid var(--border);border-radius:10px;padding:10px 6px"><div style="font-family:var(--font-body);font-size:calc(10px * var(--scale-body));letter-spacing:0.1em;text-transform:uppercase;color:var(--muted)">Armor</div><div style="font-family:var(--font-flavor);font-size:calc(26px * var(--scale-flavor));font-weight:600">{{c.armorScore}}</div></div>
@@ -200,6 +183,23 @@ export const sheetTemplate = `
         <sc-for list="{{expListView}}" as="ex" hint-placeholder-count="2">
           <div style="display:flex;justify-content:space-between;gap:10px;font-size:13.5px;padding:5px 0;border-bottom:1px solid var(--border3)"><span>{{ex.name}}</span><span style="font-weight:600;color:var(--accent,#8C5A2B)">{{ex.bonus}}</span></div>
         </sc-for>
+      </div>
+      <div style="background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:18px 20px">
+        <div style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:10px">Conditions</div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px" data-print-hide="1">
+          <sc-for list="{{conditionList}}" as="cd2" hint-placeholder-count="3">
+            <div style="display:inline-flex;align-items:center;gap:6px;border:1px solid {{cd2.bc}};background:{{cd2.bg}};color:{{cd2.fg}};border-radius:999px;padding:6px 6px 6px 14px;font-size:12.5px;cursor:pointer" title="{{cd2.desc}}">
+              <span sc-camel-on-click="{{cd2.toggle}}">{{cd2.name}}</span>
+              <sc-if value="{{cd2.removable}}" hint-placeholder-val="{{ false }}">
+                <button sc-camel-on-click="{{cd2.remove}}" style="border:none;background:none;color:inherit;opacity:0.6;cursor:pointer;font-size:12px;padding:0 2px">✕</button>
+              </sc-if>
+            </div>
+          </sc-for>
+        </div>
+        <div style="display:flex;gap:6px" data-print-hide="1">
+          <input value="{{newConditionName}}" sc-camel-on-change="{{setNewConditionName}}" placeholder="Custom condition" style="flex:1;border:1px solid var(--border2);border-radius:8px;padding:7px 10px;font-size:13px;background:var(--input-bg)">
+          <button sc-camel-on-click="{{addCondition}}" style="border:1px solid var(--border2);background:var(--panel);color:var(--text);border-radius:8px;padding:7px 14px;font-size:13px;cursor:pointer" style-hover="border-color:var(--text)">Add</button>
+        </div>
       </div>
     </div>
 

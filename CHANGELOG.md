@@ -2,6 +2,25 @@
 
 All notable changes to the Daggerheart Tracker are logged here. Format loosely follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [0.12.4] — 2026-09-24
+
+### Changed
+- **Conditions moved to the bottom of the Play tab's left column.** It was the first box, above Evasion/Armor/Proficiency, thresholds, and traits, which pushed the stats you check most often further down the sheet. Evasion/Armor/Prof, Traits, and Experiences each move up one slot.
+
+## [0.12.3] — 2026-09-24
+
+### Added
+- **Optional token counter on domain cards.** Track things like a rage/combo/charge count per card — off by default, per-card. Max is either a fixed number or driven by one of the character's traits (e.g. Finesse, Presence), with +/− controls and a reset. Shows in both the loadout and vault.
+
+### Fixed
+- **Ghost `weapons` field.** Characters migrated from the old single-weapon schema kept a stale `weapons.primary`/`.secondary` object (e.g. still "Dagger") forever, desynced from the real `weaponsPrimary`/`weaponsSecondary` lists it was replaced by — nothing displayed it, but it lingered in every save and JSON export. `normalizeChar()` now drops it after the one-time migration into the new lists, and new characters no longer get it seeded at all.
+- **New weapon rows always defaulted to Melee range with no way to pull a known weapon's real stats.** The Gear tab's weapon-name fields now suggest from every named weapon already known to the app (every class's starting weapons, plus the wizard presets) via a datalist, and typing an exact match auto-fills its range and damage instead of leaving them blank/Melee.
+- Fixed the template engine (`core/dcEngine.js`) silently stripping any literal HTML `list` attribute on every element (not just `<sc-for>`, whose own `list` attribute it was actually meant for) — this is what made the weapon datalist above possible.
+
+### Added
+- **Two custom Thessamere typefaces** ("Old Hand" for names/numbers/titles, "Common Hand" for short labels/tags/recap prose) for flavor, loaded via `@font-face` and driven by new `--font-flavor`/`--font-body`/`--font-chrome` CSS variables with per-context scale multipliers. Small/fixed-width UI chrome (nav, card rules text) and anything read at length stays on the plain chrome font at normal size — the script faces are for short, glanceable text only.
+- **"Decorative fonts" toggle** in Options (roster screen), next to Theme. Single on/off switch (not per-font) that falls back all three font variables to the chrome font and resets scales to 1x. Stored in `localStorage` only — a per-device reading preference, not synced to the account or shared with other players at the table.
+
 ## [0.12.1] — 2026-07-20
 
 ### Fixed

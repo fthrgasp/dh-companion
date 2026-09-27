@@ -2,6 +2,11 @@
 
 All notable changes to the Daggerheart Tracker are logged here. Format loosely follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [0.12.6] — 2026-09-27
+
+### Fixed
+- **Signed-in cloud sync could silently drop characters.** On every page load (including the auto-reload from the update banner) and on every campaign switch, the app pulled characters from Supabase for the active game and *replaced* the local list outright — so if the cloud copy was incomplete for any reason (a character synced moments ago, one created while briefly offline), it vanished from the roster the instant that fetch resolved. Any edit afterward then wrote the now-incomplete list back to local storage, making the loss stick. `refreshCharsFromRemote` now merges local and remote characters by id instead of overwriting, so a character present locally can never disappear just because one particular fetch didn't see it in the cloud yet.
+
 ## [0.12.5] — 2026-09-27
 
 ### Fixed

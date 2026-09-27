@@ -30,14 +30,20 @@ export const supabaseMixin = {
   refreshCharsFromRemote(gameId, opts) {
     opts = opts || {};
     this.loadCharsRemote(gameId).then(remoteChars => {
-      if (opts.checkImport && remoteChars.length === 0) {
-        const localChars = this.loadGameData(gameId).chars || [];
-        if (localChars.length) {
-          this.setState({ localImportPrompt: { gameId, count: localChars.length, chars: localChars } });
-          return;
-        }
+      const localChars = this.loadGameData(gameId).chars || [];
+      if (opts.checkImport && remoteChars.length === 0 && localChars.length) {
+        this.setState({ localImportPrompt: { gameId, count: localChars.length, chars: localChars } });
+        return;
       }
-      this.setState({ chars: remoteChars });
+      // Merge rather than overwrite: a character that only exists locally
+      // (created moments ago, or synced while offline) must never vanish
+      // just because this particular fetch didn't see it in the cloud yet —
+      // that previously nuked characters silently on any reload/game-switch
+      // whenever the remote copy was incomplete. Local wins on id collisions
+      // since it's what the player is actively looking at.
+      const localIds = new Set(localChars.map(c => c.id));
+      const merged = localChars.concat(remoteChars.filter(c => !localIds.has(c.id)));
+      this.setState({ chars: merged });
     });
   },
 

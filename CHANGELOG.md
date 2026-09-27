@@ -2,6 +2,11 @@
 
 All notable changes to the Daggerheart Tracker are logged here. Format loosely follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [0.12.5] — 2026-09-27
+
+### Fixed
+- **Domain card text (and a couple other spots) was nearly unreadable in dark mode.** Card body text, the "No companion yet" placeholder, and the Advancement log both used a hardcoded dark-brown color instead of the theme-aware `--text` variable, so against dark mode's dark panel background it was barely visible. Switched to `var(--text)` (matching the rest of the app's theme handling) — legible in both themes now.
+
 ## [0.12.4] — 2026-09-24
 
 ### Changed

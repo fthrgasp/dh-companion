@@ -339,7 +339,7 @@ export const sheetTemplate = `
             <div style="flex:none;width:10px;align-self:stretch;border-radius:5px;background:{{cd.chip}}"></div>
             <div style="flex:1">
               <div style="display:flex;gap:10px;align-items:baseline;flex-wrap:wrap"><span style="font-family:var(--font-flavor);font-size:calc(17px * var(--scale-flavor));font-weight:600">{{cd.name}}</span><span style="font-family:var(--font-body);font-size:calc(11.5px * var(--scale-body));color:var(--muted);letter-spacing:0.05em;text-transform:uppercase">{{cd.meta}}</span></div>
-              <div style="font-family:var(--font-chrome);font-size:13.5px;color:#4d463a;margin-top:4px;line-height:1.45">{{cd.text}}</div>
+              <div style="font-family:var(--font-chrome);font-size:13.5px;color:var(--text);opacity:0.85;margin-top:4px;line-height:1.45">{{cd.text}}</div>
               <div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border3)">
                 <sc-if value="{{cd.tokensOff}}" hint-placeholder-val="{{ true }}">
                   <button sc-camel-on-click="{{cd.toggleTokens}}" style="border:1px dashed var(--border2);background:none;color:var(--muted);border-radius:7px;padding:4px 10px;font-size:11.5px;cursor:pointer;font-family:var(--font-chrome)" style-hover="border-color:var(--accent,#8C5A2B);color:var(--accent,#8C5A2B)">+ Track tokens</button>
@@ -381,7 +381,7 @@ export const sheetTemplate = `
             <div style="flex:none;width:10px;align-self:stretch;border-radius:5px;background:{{cd.chip}}"></div>
             <div style="flex:1">
               <div style="display:flex;gap:10px;align-items:baseline;flex-wrap:wrap"><span style="font-family:var(--font-flavor);font-size:calc(16px * var(--scale-flavor));font-weight:600">{{cd.name}}</span><span style="font-family:var(--font-body);font-size:calc(11.5px * var(--scale-body));color:var(--muted);letter-spacing:0.05em;text-transform:uppercase">{{cd.meta}}</span></div>
-              <div style="font-family:var(--font-chrome);font-size:13px;color:#4d463a;margin-top:4px;line-height:1.45">{{cd.text}}</div>
+              <div style="font-family:var(--font-chrome);font-size:13px;color:var(--text);margin-top:4px;line-height:1.45">{{cd.text}}</div>
               <div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border3)">
                 <sc-if value="{{cd.tokensOff}}" hint-placeholder-val="{{ true }}">
                   <button sc-camel-on-click="{{cd.toggleTokens}}" style="border:1px dashed var(--border2);background:none;color:var(--muted);border-radius:7px;padding:4px 10px;font-size:11.5px;cursor:pointer;font-family:var(--font-chrome)" style-hover="border-color:var(--accent,#8C5A2B);color:var(--accent,#8C5A2B)">+ Track tokens</button>
@@ -615,7 +615,7 @@ CARD: ...</pre>
   <div data-screen-label="Companion">
     <sc-if value="{{noComp}}" hint-placeholder-val="{{ false }}">
       <div style="border:2px dashed var(--border2);border-radius:12px;padding:40px;text-align:center;color:var(--muted);max-width:520px">
-        <div style="font-family:var(--font-flavor);font-size:calc(19px * var(--scale-flavor));color:#4d463a;margin-bottom:6px">No companion yet</div>
+        <div style="font-family:var(--font-flavor);font-size:calc(19px * var(--scale-flavor));color:var(--text);opacity:0.85;margin-bottom:6px">No companion yet</div>
         <div style="font-size:13px;margin-bottom:16px">Beastbound rangers fight alongside an animal companion.</div>
         <button sc-camel-on-click="{{addComp}}" style="border:none;background:var(--accent,#8C5A2B);color:#fff;border-radius:8px;padding:10px 20px;font-size:14px;cursor:pointer">Add companion</button>
       </div>
@@ -888,7 +888,7 @@ CARD: ...</pre>
       <div style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:10px">Advancement log</div>
       <div style="display:flex;flex-direction:column;gap:6px">
         <sc-for list="{{levelLog}}" as="lg" hint-placeholder-count="3">
-          <div style="font-size:13px;color:#4d463a;border-bottom:1px solid var(--border3);padding:5px 0">{{lg.text}}</div>
+          <div style="font-size:13px;color:var(--text);opacity:0.85;border-bottom:1px solid var(--border3);padding:5px 0">{{lg.text}}</div>
         </sc-for>
       </div>
     </div>

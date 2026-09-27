@@ -256,6 +256,27 @@ export const compendiumMixin = {
     ];
   },
 
+  // Flattens every named weapon already known to the app (every class's
+  // starting weapons, plus the generic wizard presets) into one deduped
+  // name -> range/damage lookup, so typing a known weapon's name anywhere
+  // (currently: the Gear tab's weapon rows) can pull its stats instead of
+  // always defaulting to Melee with blank damage. Void "pending" placeholders
+  // are excluded since they have no real stats to offer.
+  weaponTable() {
+    const cd = this.classData();
+    const seen = new Set();
+    const out = [];
+    const add = w => {
+      const key = (w.name || '').trim().toLowerCase();
+      if (!key || seen.has(key) || key.indexOf('pending') !== -1) return;
+      seen.add(key);
+      out.push({ name: w.name, range: w.range, damage: w.damage });
+    };
+    Object.keys(cd).forEach(k => (cd[k].weapons || []).forEach(add));
+    this.weaponPresets().forEach(add);
+    return out;
+  },
+
   armorPresets() {
     return [
       { id: 'light', name: 'Leather armor', score: 3 },
@@ -270,8 +291,8 @@ export const companionCompendiumTemplate = `
 <sc-if value="{{isCompendium}}" hint-placeholder-val="{{ false }}">
 <div data-screen-label="Companion Compendium" style="max-width:920px;margin:0 auto;padding:48px 32px">
   <div style="display:flex;align-items:center;gap:14px;border-bottom:2px solid var(--text);padding-bottom:14px;margin-bottom:20px">
-    <button sc-camel-on-click="{{goRoster}}" style="border:1px solid var(--border2);background:var(--panel);color:var(--text);border-radius:8px;padding:8px 14px;font-size:13px;cursor:pointer" style-hover="border-color:var(--text)">← Roster</button>
-    <h1 style="font-family:'Spectral',serif;font-weight:600;font-size:30px;margin:0;letter-spacing:-0.01em;flex:1">Companion Compendium</h1>
+    <button sc-camel-on-click="{{goRoster}}" style="border:1px solid var(--border2);background:var(--panel);color:var(--text);border-radius:8px;padding:8px 14px;font-size:13px;cursor:pointer;font-family:var(--font-chrome)" style-hover="border-color:var(--text)">← Roster</button>
+    <h1 style="font-family:var(--font-flavor);font-weight:600;font-size:calc(30px * var(--scale-flavor));margin:0;letter-spacing:-0.01em;flex:1">Companion Compendium</h1>
   </div>
   <p style="font-size:13px;color:var(--muted);margin:0 0 18px">Every companion across the party, at a glance. Tap a card to jump to its owner.</p>
   <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px">
@@ -288,10 +309,10 @@ export const companionCompendiumTemplate = `
           </div>
         </sc-if>
         <div style="font-size:11px;letter-spacing:0.06em;text-transform:uppercase;color:var(--muted)">{{cm.ownerName}}'s companion</div>
-        <div style="font-family:'Spectral',serif;font-size:19px;font-weight:600;margin-top:2px">{{cm.name}}</div>
+        <div style="font-family:var(--font-flavor);font-size:calc(19px * var(--scale-flavor));font-weight:600;margin-top:2px">{{cm.name}}</div>
         <div style="font-size:12.5px;color:var(--muted);margin-bottom:10px">{{cm.movement}}</div>
         <div style="display:flex;gap:10px;margin-bottom:10px">
-          <div style="flex:1;border:1px solid var(--border);border-radius:8px;padding:6px;text-align:center"><div style="font-size:9.5px;color:var(--muted);text-transform:uppercase">Difficulty</div><div style="font-family:'Spectral',serif;font-size:17px;font-weight:600">{{cm.difficulty}}</div></div>
+          <div style="flex:1;border:1px solid var(--border);border-radius:8px;padding:6px;text-align:center"><div style="font-size:9.5px;color:var(--muted);text-transform:uppercase">Difficulty</div><div style="font-family:var(--font-flavor);font-size:calc(17px * var(--scale-flavor));font-weight:600">{{cm.difficulty}}</div></div>
           <div style="flex:2;border:1px solid var(--border);border-radius:8px;padding:6px 8px"><div style="font-size:9.5px;color:var(--muted);text-transform:uppercase">Attack</div><div style="font-size:12.5px;font-weight:600">{{cm.attack}}</div></div>
         </div>
         <div style="font-size:11px;letter-spacing:0.06em;text-transform:uppercase;color:#5B4A8A;margin-bottom:5px">Stress {{cm.stTxt}}</div>

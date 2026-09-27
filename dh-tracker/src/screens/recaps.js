@@ -25,8 +25,8 @@ export const recapsTemplate = `
 <sc-if value="{{isRecaps}}" hint-placeholder-val="{{ false }}">
 <div data-screen-label="Session Recaps" style="max-width:760px;margin:0 auto;padding:48px 32px">
   <div style="display:flex;align-items:center;gap:14px;border-bottom:2px solid var(--text);padding-bottom:14px;margin-bottom:20px">
-    <button sc-camel-on-click="{{goRoster}}" style="border:1px solid var(--border2);background:var(--panel);color:var(--text);border-radius:8px;padding:8px 14px;font-size:13px;cursor:pointer" style-hover="border-color:var(--text)">← Roster</button>
-    <h1 style="font-family:'Spectral',serif;font-weight:600;font-size:30px;margin:0;letter-spacing:-0.01em;flex:1">Session Recaps</h1>
+    <button sc-camel-on-click="{{goRoster}}" style="border:1px solid var(--border2);background:var(--panel);color:var(--text);border-radius:8px;padding:8px 14px;font-size:13px;cursor:pointer;font-family:var(--font-chrome)" style-hover="border-color:var(--text)">← Roster</button>
+    <h1 style="font-family:var(--font-flavor);font-weight:600;font-size:calc(30px * var(--scale-flavor));margin:0;letter-spacing:-0.01em;flex:1">Session Recaps</h1>
   </div>
   <div style="background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:16px 18px;margin-bottom:20px">
     <div style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:10px">Log this session</div>
@@ -41,10 +41,10 @@ export const recapsTemplate = `
     <sc-for list="{{recapList}}" as="rc2" hint-placeholder-count="2">
       <div style="background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:16px 18px">
         <div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px">
-          <div style="display:flex;gap:10px;align-items:baseline;flex-wrap:wrap"><span style="font-size:11px;letter-spacing:0.06em;text-transform:uppercase;color:var(--accent,#8C5A2B);font-weight:600">{{rc2.date}}</span><span style="font-family:'Spectral',serif;font-size:18px;font-weight:600">{{rc2.title}}</span></div>
+          <div style="display:flex;gap:10px;align-items:baseline;flex-wrap:wrap"><span style="font-family:var(--font-body);font-size:calc(11px * var(--scale-body));letter-spacing:0.06em;text-transform:uppercase;color:var(--accent,#8C5A2B);font-weight:600">{{rc2.date}}</span><span style="font-family:var(--font-flavor);font-size:calc(18px * var(--scale-flavor));font-weight:600">{{rc2.title}}</span></div>
           <button sc-camel-on-click="{{rc2.remove}}" style="border:none;background:none;color:var(--muted);cursor:pointer;font-size:14px;padding:2px" style-hover="color:#A33B3B">✕</button>
         </div>
-        <div style="font-size:13.5px;color:var(--text);line-height:1.55;margin-top:8px;opacity:0.85">{{rc2.text}}</div>
+        <div style="font-family:var(--font-body);font-size:calc(13.5px * var(--scale-body-recap));color:var(--text);line-height:1.55;margin-top:8px;opacity:0.85">{{rc2.text}}</div>
       </div>
     </sc-for>
   </div>

@@ -48,9 +48,24 @@ export const sheetMixin = {
     const c = this.active();
     if (!c) return [];
     const list = c[listKey] || [];
+    const table = this.weaponTable();
     return list.map((w, i) => ({
       equipped: { val: !!w.equipped, on: () => this.up(ch => { ch[listKey][i].equipped = !ch[listKey][i].equipped; }) },
-      name: { val: w.name, on: e => this.up(ch => { ch[listKey][i].name = e.target.value; }) },
+      // Typing (or picking, via the shared <datalist>) the exact name of a
+      // known weapon pulls its range/damage from the table instead of
+      // leaving new rows stuck on the "Melee" default with blank damage.
+      name: {
+        val: w.name,
+        on: e => this.up(ch => {
+          const val = e.target.value;
+          ch[listKey][i].name = val;
+          const known = table.find(t => t.name.toLowerCase() === val.trim().toLowerCase());
+          if (known) {
+            ch[listKey][i].range = known.range;
+            ch[listKey][i].damage = known.damage;
+          }
+        })
+      },
       range: { val: w.range, on: e => this.up(ch => { ch[listKey][i].range = e.target.value; }) },
       damage: { val: w.damage, on: e => this.up(ch => { ch[listKey][i].damage = e.target.value; }) },
       remove: () => this.up(ch => ch[listKey].splice(i, 1)),
@@ -86,11 +101,11 @@ export const sheetTemplate = `
       <button sc-camel-on-click="{{togglePages}}" style="border:1px solid var(--border2);background:var(--panel);border-radius:8px;padding:8px 14px;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:7px" style-hover="border-color:var(--text)">Pages <span style="font-size:10px;color:var(--muted)">▾</span></button>
       <sc-if value="{{pagesOpen}}" hint-placeholder-val="{{ false }}">
         <div style="position:absolute;top:calc(100% + 6px);left:0;z-index:50;min-width:220px;background:var(--panel);border:1px solid var(--border2);border-radius:10px;box-shadow:0 8px 24px rgba(38,34,27,0.14);padding:6px;display:flex;flex-direction:column;gap:2px">
-          <button sc-camel-on-click="{{pageRoster}}" style="border:none;background:none;text-align:left;border-radius:7px;padding:9px 12px;font-size:13.5px;cursor:pointer;font-weight:600" style-hover="background:var(--highlight-bg)">Party Roster</button>
-          <button sc-camel-on-click="{{goPartyMenu}}" style="border:none;background:none;text-align:left;border-radius:7px;padding:9px 12px;font-size:13.5px;cursor:pointer;font-weight:600" style-hover="background:var(--highlight-bg)">Shared Inventory</button>
-          <button sc-camel-on-click="{{goRecapsMenu}}" style="border:none;background:none;text-align:left;border-radius:7px;padding:9px 12px;font-size:13.5px;cursor:pointer;font-weight:600" style-hover="background:var(--highlight-bg)">Session Recaps</button>
-          <button sc-camel-on-click="{{goCreaturesMenu}}" style="border:none;background:none;text-align:left;border-radius:7px;padding:9px 12px;font-size:13.5px;cursor:pointer;font-weight:600" style-hover="background:var(--highlight-bg)">Creatures</button>
-          <button sc-camel-on-click="{{goCompendiumMenu}}" style="border:none;background:none;text-align:left;border-radius:7px;padding:9px 12px;font-size:13.5px;cursor:pointer;font-weight:600" style-hover="background:var(--highlight-bg)">Companion Compendium</button>
+          <button sc-camel-on-click="{{pageRoster}}" style="border:none;background:none;text-align:left;border-radius:7px;padding:9px 12px;font-size:13.5px;cursor:pointer;font-weight:600;font-family:var(--font-chrome)" style-hover="background:var(--highlight-bg)">Party Roster</button>
+          <button sc-camel-on-click="{{goPartyMenu}}" style="border:none;background:none;text-align:left;border-radius:7px;padding:9px 12px;font-size:13.5px;cursor:pointer;font-weight:600;font-family:var(--font-chrome)" style-hover="background:var(--highlight-bg)">Shared Inventory</button>
+          <button sc-camel-on-click="{{goRecapsMenu}}" style="border:none;background:none;text-align:left;border-radius:7px;padding:9px 12px;font-size:13.5px;cursor:pointer;font-weight:600;font-family:var(--font-chrome)" style-hover="background:var(--highlight-bg)">Session Recaps</button>
+          <button sc-camel-on-click="{{goCreaturesMenu}}" style="border:none;background:none;text-align:left;border-radius:7px;padding:9px 12px;font-size:13.5px;cursor:pointer;font-weight:600;font-family:var(--font-chrome)" style-hover="background:var(--highlight-bg)">Creatures</button>
+          <button sc-camel-on-click="{{goCompendiumMenu}}" style="border:none;background:none;text-align:left;border-radius:7px;padding:9px 12px;font-size:13.5px;cursor:pointer;font-weight:600;font-family:var(--font-chrome)" style-hover="background:var(--highlight-bg)">Companion Compendium</button>
           <div style="height:1px;background:var(--border3);margin:3px 6px"></div>
           <sc-for list="{{pageList}}" as="pg" hint-placeholder-count="3">
             <button sc-camel-on-click="{{pg.open}}" style="border:none;background:none;text-align:left;border-radius:7px;padding:9px 12px;font-size:13.5px;cursor:pointer;display:flex;justify-content:space-between;gap:10px;align-items:baseline;color:{{pg.fg}};background:{{pg.bg}}" style-hover="background:var(--highlight-bg)"><span>{{pg.name}}</span><span style="font-size:11px;color:var(--muted)">{{pg.sub}}</span></button>
@@ -102,15 +117,15 @@ export const sheetTemplate = `
       <x-import component-from-global-scope="image-slot" from="c6b115b3-1cc5-46ce-8deb-17fd610f11d8#/image-slot.js" id="portrait-{{c.id}}" shape="circle" placeholder="Photo" style="width:52px;height:52px" hint-size="52px,52px"></x-import>
     </div>
     <div style="flex:1;min-width:200px">
-      <div style="font-family:'Spectral',serif;font-size:26px;font-weight:600;line-height:1.1">{{c.name}}</div>
-      <div style="font-size:12.5px;color:var(--muted)">{{headerSub}}</div>
+      <div style="font-family:var(--font-flavor);font-size:calc(26px * var(--scale-flavor));font-weight:600;line-height:1.1">{{c.name}}</div>
+      <div style="font-family:var(--font-body);font-size:calc(12.5px * var(--scale-body));color:var(--muted)">{{headerSub}}</div>
       <sc-if value="{{isMulticlass}}" hint-placeholder-val="{{ false }}">
         <div style="margin-top:4px;display:inline-flex;align-items:center;gap:6px;font-size:11px;color:var(--accent,#8C5A2B);background:var(--highlight-bg);border-radius:999px;padding:2px 10px">Multiclass · {{multiclassLabel}}</div>
       </sc-if>
     </div>
     <div style="display:flex;align-items:center;gap:8px">
       <div style="display:flex;align-items:center;gap:8px;border:1px solid var(--border2);background:var(--panel);border-radius:8px;padding:6px 6px 6px 12px" data-print-hide="1">
-        <span style="font-family:'Spectral',serif;font-size:15px;font-weight:600;min-width:52px">{{sessionTimeTxt}}</span>
+        <span style="font-family:var(--font-flavor);font-size:calc(15px * var(--scale-flavor));font-weight:600;min-width:52px">{{sessionTimeTxt}}</span>
         <button sc-camel-on-click="{{sessionToggle}}" style="width:28px;height:28px;border:none;background:var(--highlight-bg);color:var(--text);border-radius:6px;cursor:pointer;font-size:12px">{{sessionToggleLabel}}</button>
         <button sc-camel-on-click="{{sessionReset}}" style="width:28px;height:28px;border:none;background:none;color:var(--muted);cursor:pointer;font-size:13px" style-hover="color:#A33B3B">↻</button>
       </div>
@@ -124,7 +139,7 @@ export const sheetTemplate = `
         </sc-if>
       </div>
       <button sc-camel-on-click="{{toggleDark}}" data-print-hide="1" style="border:1px solid var(--border2);background:var(--panel);color:var(--text);border-radius:8px;padding:8px 14px;font-size:13px;cursor:pointer" style-hover="border-color:var(--text)">{{darkLabel}}</button>
-      <div style="text-align:center;background:var(--accent,#8C5A2B);color:#fff;border-radius:10px;padding:6px 14px"><div style="font-size:9.5px;letter-spacing:0.1em;text-transform:uppercase;opacity:0.8">Level</div><div style="font-family:'Spectral',serif;font-size:20px;font-weight:600;line-height:1">{{c.level}}</div></div>
+      <div style="text-align:center;background:var(--accent,#8C5A2B);color:#fff;border-radius:10px;padding:6px 14px"><div style="font-size:9.5px;letter-spacing:0.1em;text-transform:uppercase;opacity:0.8">Level</div><div style="font-family:var(--font-flavor);font-size:calc(20px * var(--scale-flavor));font-weight:600;line-height:1">{{c.level}}</div></div>
     </div>
   </div>
   <!-- Tabs -->
@@ -141,6 +156,35 @@ export const sheetTemplate = `
     <!-- Column A: stats -->
     <div style="flex:1;min-width:290px;display:flex;flex-direction:column;gap:16px">
       <div style="background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:18px 20px">
+        <div style="display:flex;gap:10px">
+          <div style="flex:1;text-align:center;border:1px solid var(--border);border-radius:10px;padding:10px 6px"><div style="font-family:var(--font-body);font-size:calc(10px * var(--scale-body));letter-spacing:0.1em;text-transform:uppercase;color:var(--muted)">Evasion</div><div style="font-family:var(--font-flavor);font-size:calc(26px * var(--scale-flavor));font-weight:600">{{c.evasion}}</div></div>
+          <div style="flex:1;text-align:center;border:1px solid var(--border);border-radius:10px;padding:10px 6px"><div style="font-family:var(--font-body);font-size:calc(10px * var(--scale-body));letter-spacing:0.1em;text-transform:uppercase;color:var(--muted)">Armor</div><div style="font-family:var(--font-flavor);font-size:calc(26px * var(--scale-flavor));font-weight:600">{{c.armorScore}}</div></div>
+          <div style="flex:1;text-align:center;border:1px solid var(--border);border-radius:10px;padding:10px 6px"><div style="font-family:var(--font-body);font-size:calc(10px * var(--scale-body));letter-spacing:0.1em;text-transform:uppercase;color:var(--muted)">Prof.</div><div style="font-family:var(--font-flavor);font-size:calc(26px * var(--scale-flavor));font-weight:600">{{c.proficiency}}</div></div>
+        </div>
+        <div style="margin-top:14px">
+          <div style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:6px">Damage thresholds</div>
+          <div style="display:flex;border:1px solid var(--border);border-radius:8px;overflow:hidden;text-align:center;font-size:12px">
+            <div style="flex:1;padding:8px 4px;background:var(--input-bg)"><div style="color:var(--muted)">Minor</div><div style="font-weight:600">1+ · mark 1</div></div>
+            <div style="flex:1;padding:8px 4px;border-left:1px solid var(--border);background:var(--major-bg)"><div style="color:var(--muted)">Major</div><div style="font-weight:600">{{c.thresholds.major}}+ · mark 2</div></div>
+            <div style="flex:1;padding:8px 4px;border-left:1px solid var(--border);background:var(--severe-bg)"><div style="color:var(--muted)">Severe</div><div style="font-weight:600">{{c.thresholds.severe}}+ · mark 3</div></div>
+          </div>
+        </div>
+      </div>
+      <div style="background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:18px 20px">
+        <div style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:10px">Traits</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+          <sc-for list="{{traitList}}" as="tr" hint-placeholder-count="6">
+            <div style="border:1px solid var(--border);border-radius:10px;padding:8px 4px;text-align:center"><div style="font-family:var(--font-body);font-size:calc(10px * var(--scale-body));letter-spacing:0.08em;text-transform:uppercase;color:var(--muted)">{{tr.name}}</div><div style="font-family:var(--font-flavor);font-size:calc(22px * var(--scale-flavor));font-weight:600">{{tr.val}}</div></div>
+          </sc-for>
+        </div>
+      </div>
+      <div style="background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:18px 20px">
+        <div style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Experiences</div>
+        <sc-for list="{{expListView}}" as="ex" hint-placeholder-count="2">
+          <div style="display:flex;justify-content:space-between;gap:10px;font-size:13.5px;padding:5px 0;border-bottom:1px solid var(--border3)"><span>{{ex.name}}</span><span style="font-weight:600;color:var(--accent,#8C5A2B)">{{ex.bonus}}</span></div>
+        </sc-for>
+      </div>
+      <div style="background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:18px 20px">
         <div style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:10px">Conditions</div>
         <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px" data-print-hide="1">
           <sc-for list="{{conditionList}}" as="cd2" hint-placeholder-count="3">
@@ -156,35 +200,6 @@ export const sheetTemplate = `
           <input value="{{newConditionName}}" sc-camel-on-change="{{setNewConditionName}}" placeholder="Custom condition" style="flex:1;border:1px solid var(--border2);border-radius:8px;padding:7px 10px;font-size:13px;background:var(--input-bg)">
           <button sc-camel-on-click="{{addCondition}}" style="border:1px solid var(--border2);background:var(--panel);color:var(--text);border-radius:8px;padding:7px 14px;font-size:13px;cursor:pointer" style-hover="border-color:var(--text)">Add</button>
         </div>
-      </div>
-      <div style="background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:18px 20px">
-        <div style="display:flex;gap:10px">
-          <div style="flex:1;text-align:center;border:1px solid var(--border);border-radius:10px;padding:10px 6px"><div style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted)">Evasion</div><div style="font-family:'Spectral',serif;font-size:26px;font-weight:600">{{c.evasion}}</div></div>
-          <div style="flex:1;text-align:center;border:1px solid var(--border);border-radius:10px;padding:10px 6px"><div style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted)">Armor</div><div style="font-family:'Spectral',serif;font-size:26px;font-weight:600">{{c.armorScore}}</div></div>
-          <div style="flex:1;text-align:center;border:1px solid var(--border);border-radius:10px;padding:10px 6px"><div style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted)">Prof.</div><div style="font-family:'Spectral',serif;font-size:26px;font-weight:600">{{c.proficiency}}</div></div>
-        </div>
-        <div style="margin-top:14px">
-          <div style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:6px">Damage thresholds</div>
-          <div style="display:flex;border:1px solid var(--border);border-radius:8px;overflow:hidden;text-align:center;font-size:12px">
-            <div style="flex:1;padding:8px 4px;background:var(--input-bg)"><div style="color:var(--muted)">Minor</div><div style="font-weight:600">1+ · mark 1</div></div>
-            <div style="flex:1;padding:8px 4px;border-left:1px solid var(--border);background:var(--major-bg)"><div style="color:var(--muted)">Major</div><div style="font-weight:600">{{c.thresholds.major}}+ · mark 2</div></div>
-            <div style="flex:1;padding:8px 4px;border-left:1px solid var(--border);background:var(--severe-bg)"><div style="color:var(--muted)">Severe</div><div style="font-weight:600">{{c.thresholds.severe}}+ · mark 3</div></div>
-          </div>
-        </div>
-      </div>
-      <div style="background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:18px 20px">
-        <div style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:10px">Traits</div>
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
-          <sc-for list="{{traitList}}" as="tr" hint-placeholder-count="6">
-            <div style="border:1px solid var(--border);border-radius:10px;padding:8px 4px;text-align:center"><div style="font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted)">{{tr.name}}</div><div style="font-family:'Spectral',serif;font-size:22px;font-weight:600">{{tr.val}}</div></div>
-          </sc-for>
-        </div>
-      </div>
-      <div style="background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:18px 20px">
-        <div style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Experiences</div>
-        <sc-for list="{{expListView}}" as="ex" hint-placeholder-count="2">
-          <div style="display:flex;justify-content:space-between;gap:10px;font-size:13.5px;padding:5px 0;border-bottom:1px solid var(--border3)"><span>{{ex.name}}</span><span style="font-weight:600;color:var(--accent,#8C5A2B)">{{ex.bonus}}</span></div>
-        </sc-for>
       </div>
     </div>
 
@@ -276,7 +291,7 @@ export const sheetTemplate = `
             <div style="display:flex;align-items:center;gap:8px">
               <span style="flex:1;font-size:14px">{{tk.label}}</span>
               <button sc-camel-on-click="{{tk.dec}}" style="width:28px;height:28px;border:1px solid var(--border2);background:var(--panel);border-radius:7px;cursor:pointer;font-size:15px">−</button>
-              <span style="width:26px;text-align:center;font-family:'Spectral',serif;font-size:19px;font-weight:600">{{tk.value}}</span>
+              <span style="width:26px;text-align:center;font-family:var(--font-flavor);font-size:calc(19px * var(--scale-flavor));font-weight:600">{{tk.value}}</span>
               <button sc-camel-on-click="{{tk.inc}}" style="width:28px;height:28px;border:1px solid var(--border2);background:var(--panel);border-radius:7px;cursor:pointer;font-size:15px">+</button>
               <button sc-camel-on-click="{{tk.remove}}" style="border:none;background:none;color:#b3ab9d;cursor:pointer;font-size:14px;padding:2px" style-hover="color:#A33B3B">✕</button>
             </div>
@@ -317,14 +332,41 @@ export const sheetTemplate = `
   <sc-if value="{{tabCards}}" hint-placeholder-val="{{ false }}">
   <div data-screen-label="Domain cards" style="display:flex;flex-direction:column;gap:22px;max-width:820px">
     <div>
-      <div style="font-family:'Spectral',serif;font-size:19px;font-weight:600;margin-bottom:10px">Loadout <span style="font-size:12px;color:var(--muted);font-family:system-ui,sans-serif;font-weight:400">— active cards</span></div>
+      <div style="font-family:var(--font-flavor);font-size:calc(19px * var(--scale-flavor));font-weight:600;margin-bottom:10px">Loadout <span style="font-size:12px;color:var(--muted);font-family:system-ui,sans-serif;font-weight:400">— active cards</span></div>
       <div style="display:flex;flex-direction:column;gap:10px">
         <sc-for list="{{loadoutCards}}" as="cd" hint-placeholder-count="3">
           <div style="background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:16px 18px;display:flex;gap:14px;align-items:flex-start">
             <div style="flex:none;width:10px;align-self:stretch;border-radius:5px;background:{{cd.chip}}"></div>
             <div style="flex:1">
-              <div style="display:flex;gap:10px;align-items:baseline;flex-wrap:wrap"><span style="font-family:'Spectral',serif;font-size:17px;font-weight:600">{{cd.name}}</span><span style="font-size:11.5px;color:var(--muted);letter-spacing:0.05em;text-transform:uppercase">{{cd.meta}}</span></div>
-              <div style="font-size:13.5px;color:#4d463a;margin-top:4px;line-height:1.45">{{cd.text}}</div>
+              <div style="display:flex;gap:10px;align-items:baseline;flex-wrap:wrap"><span style="font-family:var(--font-flavor);font-size:calc(17px * var(--scale-flavor));font-weight:600">{{cd.name}}</span><span style="font-family:var(--font-body);font-size:calc(11.5px * var(--scale-body));color:var(--muted);letter-spacing:0.05em;text-transform:uppercase">{{cd.meta}}</span></div>
+              <div style="font-family:var(--font-chrome);font-size:13.5px;color:#4d463a;margin-top:4px;line-height:1.45">{{cd.text}}</div>
+              <div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border3)">
+                <sc-if value="{{cd.tokensOff}}" hint-placeholder-val="{{ true }}">
+                  <button sc-camel-on-click="{{cd.toggleTokens}}" style="border:1px dashed var(--border2);background:none;color:var(--muted);border-radius:7px;padding:4px 10px;font-size:11.5px;cursor:pointer;font-family:var(--font-chrome)" style-hover="border-color:var(--accent,#8C5A2B);color:var(--accent,#8C5A2B)">+ Track tokens</button>
+                </sc-if>
+                <sc-if value="{{cd.tokensOn}}" hint-placeholder-val="{{ false }}">
+                  <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:11.5px;font-family:var(--font-chrome)">
+                    <span style="letter-spacing:0.06em;text-transform:uppercase;color:var(--muted)">Tokens</span>
+                    <sc-raw-select value="{{cd.tokenMode}}" sc-camel-on-change="{{cd.setTokenMode}}" style="border:1px solid var(--border2);border-radius:6px;padding:3px 5px;font-size:11px;background:var(--input-bg)">
+                      <option value="fixed">Fixed</option><option value="trait">By trait</option>
+                    </sc-raw-select>
+                    <sc-if value="{{cd.tokenModeIsTrait}}" hint-placeholder-val="{{ false }}">
+                      <sc-raw-select value="{{cd.tokenTrait}}" sc-camel-on-change="{{cd.setTokenTrait}}" style="border:1px solid var(--border2);border-radius:6px;padding:3px 5px;font-size:11px;background:var(--input-bg)">
+                        <option value="Agility">Agility</option><option value="Strength">Strength</option><option value="Finesse">Finesse</option><option value="Instinct">Instinct</option><option value="Presence">Presence</option><option value="Knowledge">Knowledge</option>
+                      </sc-raw-select>
+                    </sc-if>
+                    <sc-if value="{{cd.tokenModeIsFixed}}" hint-placeholder-val="{{ true }}">
+                      <input type="number" value="{{cd.tokenFixed}}" sc-camel-on-change="{{cd.setTokenFixed}}" style="width:44px;border:1px solid var(--border2);border-radius:6px;padding:3px 5px;font-size:11px;background:var(--input-bg)">
+                    </sc-if>
+                    <div style="flex:1"></div>
+                    <button sc-camel-on-click="{{cd.tokenDec}}" style="width:22px;height:22px;border:1px solid var(--border2);background:var(--panel);border-radius:6px;cursor:pointer;font-size:13px;line-height:1;padding:0">−</button>
+                    <span style="font-weight:600;min-width:38px;text-align:center">{{cd.tokenCount}} / {{cd.tokenMax}}</span>
+                    <button sc-camel-on-click="{{cd.tokenInc}}" style="width:22px;height:22px;border:1px solid var(--border2);background:var(--panel);border-radius:6px;cursor:pointer;font-size:13px;line-height:1;padding:0">+</button>
+                    <button sc-camel-on-click="{{cd.tokenReset}}" style="border:none;background:none;color:var(--muted);cursor:pointer;font-size:11px" style-hover="color:var(--text)">Reset</button>
+                    <button sc-camel-on-click="{{cd.toggleTokens}}" title="Stop tracking tokens" style="border:none;background:none;color:var(--muted);cursor:pointer;font-size:12px" style-hover="color:#A33B3B">✕</button>
+                  </div>
+                </sc-if>
+              </div>
             </div>
             <button sc-camel-on-click="{{cd.move}}" style="flex:none;border:1px solid var(--border2);background:var(--panel);border-radius:8px;padding:6px 12px;font-size:12px;cursor:pointer;color:var(--muted)" style-hover="border-color:var(--text);color:var(--text)">To vault</button>
           </div>
@@ -332,14 +374,41 @@ export const sheetTemplate = `
       </div>
     </div>
     <div>
-      <div style="font-family:'Spectral',serif;font-size:19px;font-weight:600;margin-bottom:10px">Vault <span style="font-size:12px;color:var(--muted);font-family:system-ui,sans-serif;font-weight:400">— stored cards</span></div>
+      <div style="font-family:var(--font-flavor);font-size:calc(19px * var(--scale-flavor));font-weight:600;margin-bottom:10px">Vault <span style="font-size:12px;color:var(--muted);font-family:system-ui,sans-serif;font-weight:400">— stored cards</span></div>
       <div style="display:flex;flex-direction:column;gap:10px">
         <sc-for list="{{vaultCards}}" as="cd" hint-placeholder-count="1">
           <div style="background:var(--input-bg);border:1px dashed var(--border2);border-radius:12px;padding:14px 18px;display:flex;gap:14px;align-items:flex-start;opacity:0.85">
             <div style="flex:none;width:10px;align-self:stretch;border-radius:5px;background:{{cd.chip}}"></div>
             <div style="flex:1">
-              <div style="display:flex;gap:10px;align-items:baseline;flex-wrap:wrap"><span style="font-family:'Spectral',serif;font-size:16px;font-weight:600">{{cd.name}}</span><span style="font-size:11.5px;color:var(--muted);letter-spacing:0.05em;text-transform:uppercase">{{cd.meta}}</span></div>
-              <div style="font-size:13px;color:#4d463a;margin-top:4px;line-height:1.45">{{cd.text}}</div>
+              <div style="display:flex;gap:10px;align-items:baseline;flex-wrap:wrap"><span style="font-family:var(--font-flavor);font-size:calc(16px * var(--scale-flavor));font-weight:600">{{cd.name}}</span><span style="font-family:var(--font-body);font-size:calc(11.5px * var(--scale-body));color:var(--muted);letter-spacing:0.05em;text-transform:uppercase">{{cd.meta}}</span></div>
+              <div style="font-family:var(--font-chrome);font-size:13px;color:#4d463a;margin-top:4px;line-height:1.45">{{cd.text}}</div>
+              <div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border3)">
+                <sc-if value="{{cd.tokensOff}}" hint-placeholder-val="{{ true }}">
+                  <button sc-camel-on-click="{{cd.toggleTokens}}" style="border:1px dashed var(--border2);background:none;color:var(--muted);border-radius:7px;padding:4px 10px;font-size:11.5px;cursor:pointer;font-family:var(--font-chrome)" style-hover="border-color:var(--accent,#8C5A2B);color:var(--accent,#8C5A2B)">+ Track tokens</button>
+                </sc-if>
+                <sc-if value="{{cd.tokensOn}}" hint-placeholder-val="{{ false }}">
+                  <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:11.5px;font-family:var(--font-chrome)">
+                    <span style="letter-spacing:0.06em;text-transform:uppercase;color:var(--muted)">Tokens</span>
+                    <sc-raw-select value="{{cd.tokenMode}}" sc-camel-on-change="{{cd.setTokenMode}}" style="border:1px solid var(--border2);border-radius:6px;padding:3px 5px;font-size:11px;background:var(--input-bg)">
+                      <option value="fixed">Fixed</option><option value="trait">By trait</option>
+                    </sc-raw-select>
+                    <sc-if value="{{cd.tokenModeIsTrait}}" hint-placeholder-val="{{ false }}">
+                      <sc-raw-select value="{{cd.tokenTrait}}" sc-camel-on-change="{{cd.setTokenTrait}}" style="border:1px solid var(--border2);border-radius:6px;padding:3px 5px;font-size:11px;background:var(--input-bg)">
+                        <option value="Agility">Agility</option><option value="Strength">Strength</option><option value="Finesse">Finesse</option><option value="Instinct">Instinct</option><option value="Presence">Presence</option><option value="Knowledge">Knowledge</option>
+                      </sc-raw-select>
+                    </sc-if>
+                    <sc-if value="{{cd.tokenModeIsFixed}}" hint-placeholder-val="{{ true }}">
+                      <input type="number" value="{{cd.tokenFixed}}" sc-camel-on-change="{{cd.setTokenFixed}}" style="width:44px;border:1px solid var(--border2);border-radius:6px;padding:3px 5px;font-size:11px;background:var(--input-bg)">
+                    </sc-if>
+                    <div style="flex:1"></div>
+                    <button sc-camel-on-click="{{cd.tokenDec}}" style="width:22px;height:22px;border:1px solid var(--border2);background:var(--panel);border-radius:6px;cursor:pointer;font-size:13px;line-height:1;padding:0">−</button>
+                    <span style="font-weight:600;min-width:38px;text-align:center">{{cd.tokenCount}} / {{cd.tokenMax}}</span>
+                    <button sc-camel-on-click="{{cd.tokenInc}}" style="width:22px;height:22px;border:1px solid var(--border2);background:var(--panel);border-radius:6px;cursor:pointer;font-size:13px;line-height:1;padding:0">+</button>
+                    <button sc-camel-on-click="{{cd.tokenReset}}" style="border:none;background:none;color:var(--muted);cursor:pointer;font-size:11px" style-hover="color:var(--text)">Reset</button>
+                    <button sc-camel-on-click="{{cd.toggleTokens}}" title="Stop tracking tokens" style="border:none;background:none;color:var(--muted);cursor:pointer;font-size:12px" style-hover="color:#A33B3B">✕</button>
+                  </div>
+                </sc-if>
+              </div>
             </div>
             <button sc-camel-on-click="{{cd.move}}" style="flex:none;border:1px solid var(--border2);background:var(--panel);border-radius:8px;padding:6px 12px;font-size:12px;cursor:pointer" style-hover="border-color:var(--text)">Equip</button>
           </div>
@@ -435,13 +504,18 @@ CARD: ...</pre>
     <div style="flex:1;min-width:300px;display:flex;flex-direction:column;gap:16px">
       <div style="background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:18px 20px">
         <div style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:10px">Weapons</div>
+        <datalist id="weapon-table-datalist">
+          <sc-for list="{{weaponTableOptions}}" as="wt" hint-placeholder-count="3">
+            <option value="{{wt.name}}"></option>
+          </sc-for>
+        </datalist>
         <div style="font-size:11px;color:var(--muted);margin-bottom:8px">Primary</div>
         <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:8px">
           <sc-for list="{{primaryWeapons}}" as="pw" hint-placeholder-count="1">
             <div style="border:1px solid var(--border3);border-radius:10px;padding:10px 12px">
               <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
                 <label style="display:flex;align-items:center;gap:5px;font-size:11.5px;color:var(--muted);cursor:pointer"><input type="checkbox" checked="{{pw.equipped.val}}" sc-camel-on-change="{{pw.equipped.on}}">Equipped</label>
-                <input value="{{pw.name.val}}" sc-camel-on-change="{{pw.name.on}}" placeholder="Weapon name" style="flex:2;min-width:110px;border:1px solid var(--border2);border-radius:8px;padding:7px 9px;font-size:13.5px;background:var(--input-bg)">
+                <input value="{{pw.name.val}}" sc-camel-on-change="{{pw.name.on}}" placeholder="Weapon name" list="weapon-table-datalist" style="flex:2;min-width:110px;border:1px solid var(--border2);border-radius:8px;padding:7px 9px;font-size:13.5px;background:var(--input-bg)">
                 <sc-raw-select value="{{pw.range.val}}" sc-camel-on-change="{{pw.range.on}}" style="border:1px solid var(--border2);border-radius:8px;padding:7px;font-size:13px;background:var(--input-bg)">
                   <option value="Melee">Melee</option><option value="Very Close">Very Close</option><option value="Close">Close</option><option value="Far">Far</option><option value="Very Far">Very Far</option>
                 </sc-raw-select>
@@ -469,7 +543,7 @@ CARD: ...</pre>
             <div style="border:1px solid var(--border3);border-radius:10px;padding:10px 12px">
               <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
                 <label style="display:flex;align-items:center;gap:5px;font-size:11.5px;color:var(--muted);cursor:pointer"><input type="checkbox" checked="{{sw.equipped.val}}" sc-camel-on-change="{{sw.equipped.on}}">Equipped</label>
-                <input value="{{sw.name.val}}" sc-camel-on-change="{{sw.name.on}}" placeholder="Weapon name" style="flex:2;min-width:110px;border:1px solid var(--border2);border-radius:8px;padding:7px 9px;font-size:13.5px;background:var(--input-bg)">
+                <input value="{{sw.name.val}}" sc-camel-on-change="{{sw.name.on}}" placeholder="Weapon name" list="weapon-table-datalist" style="flex:2;min-width:110px;border:1px solid var(--border2);border-radius:8px;padding:7px 9px;font-size:13.5px;background:var(--input-bg)">
                 <sc-raw-select value="{{sw.range.val}}" sc-camel-on-change="{{sw.range.on}}" style="border:1px solid var(--border2);border-radius:8px;padding:7px;font-size:13px;background:var(--input-bg)">
                   <option value="Melee">Melee</option><option value="Very Close">Very Close</option><option value="Close">Close</option><option value="Far">Far</option><option value="Very Far">Very Far</option>
                 </sc-raw-select>
@@ -510,7 +584,7 @@ CARD: ...</pre>
               <div style="font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted)">{{g.label}}</div>
               <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-top:6px">
                 <button sc-camel-on-click="{{g.dec}}" style="width:26px;height:26px;border:1px solid var(--border2);background:var(--panel);border-radius:7px;cursor:pointer">−</button>
-                <span style="font-family:'Spectral',serif;font-size:20px;font-weight:600;min-width:22px">{{g.value}}</span>
+                <span style="font-family:var(--font-flavor);font-size:calc(20px * var(--scale-flavor));font-weight:600;min-width:22px">{{g.value}}</span>
                 <button sc-camel-on-click="{{g.inc}}" style="width:26px;height:26px;border:1px solid var(--border2);background:var(--panel);border-radius:7px;cursor:pointer">+</button>
               </div>
             </div>
@@ -541,7 +615,7 @@ CARD: ...</pre>
   <div data-screen-label="Companion">
     <sc-if value="{{noComp}}" hint-placeholder-val="{{ false }}">
       <div style="border:2px dashed var(--border2);border-radius:12px;padding:40px;text-align:center;color:var(--muted);max-width:520px">
-        <div style="font-family:'Spectral',serif;font-size:19px;color:#4d463a;margin-bottom:6px">No companion yet</div>
+        <div style="font-family:var(--font-flavor);font-size:calc(19px * var(--scale-flavor));color:#4d463a;margin-bottom:6px">No companion yet</div>
         <div style="font-size:13px;margin-bottom:16px">Beastbound rangers fight alongside an animal companion.</div>
         <button sc-camel-on-click="{{addComp}}" style="border:none;background:var(--accent,#8C5A2B);color:#fff;border-radius:8px;padding:10px 20px;font-size:14px;cursor:pointer">Add companion</button>
       </div>
@@ -575,8 +649,8 @@ CARD: ...</pre>
               <div style="flex:none;width:72px;height:72px">
                 <x-import component-from-global-scope="image-slot" from="c6b115b3-1cc5-46ce-8deb-17fd610f11d8#/image-slot.js" id="{{compPortraitId}}" shape="circle" placeholder="Portrait" style="width:72px;height:72px" hint-size="72px,72px"></x-import>
               </div>
-              <div style="flex:1"><div style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:4px">Name</div><input value="{{comp.name.val}}" sc-camel-on-change="{{comp.name.on}}" style="width:100%;box-sizing:border-box;border:1px solid var(--border2);border-radius:8px;padding:8px 10px;font-family:'Spectral',serif;font-size:17px;font-weight:600;background:var(--input-bg)"></div>
-              <div style="flex:none;text-align:center;background:var(--accent,#8C5A2B);color:#fff;border-radius:10px;padding:6px 12px"><div style="font-size:9px;letter-spacing:0.1em;text-transform:uppercase;opacity:0.8">Level</div><div style="font-family:'Spectral',serif;font-size:18px;font-weight:600;line-height:1">{{compLevel}}</div></div>
+              <div style="flex:1"><div style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:4px">Name</div><input value="{{comp.name.val}}" sc-camel-on-change="{{comp.name.on}}" style="width:100%;box-sizing:border-box;border:1px solid var(--border2);border-radius:8px;padding:8px 10px;font-family:var(--font-flavor);font-size:calc(17px * var(--scale-flavor));font-weight:600;background:var(--input-bg)"></div>
+              <div style="flex:none;text-align:center;background:var(--accent,#8C5A2B);color:#fff;border-radius:10px;padding:6px 12px"><div style="font-size:9px;letter-spacing:0.1em;text-transform:uppercase;opacity:0.8">Level</div><div style="font-family:var(--font-flavor);font-size:calc(18px * var(--scale-flavor));font-weight:600;line-height:1">{{compLevel}}</div></div>
             </div>
             <div style="display:flex;gap:10px">
               <div style="flex:1"><div style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:4px">Difficulty</div><input type="number" value="{{comp.difficulty.val}}" sc-camel-on-change="{{comp.difficulty.on}}" style="width:100%;box-sizing:border-box;border:1px solid var(--border2);border-radius:8px;padding:8px 10px;font-size:14px;background:var(--input-bg)"></div>
@@ -658,7 +732,7 @@ CARD: ...</pre>
   <div data-screen-label="Wildshape" style="display:flex;flex-direction:column;gap:16px;max-width:820px">
     <sc-if value="{{wildshapeActiveBanner}}" hint-placeholder-val="{{ false }}">
       <div style="background:var(--highlight-bg);border:1px solid var(--accent,#8C5A2B);border-radius:12px;padding:14px 18px;display:flex;align-items:center;gap:14px;flex-wrap:wrap">
-        <div style="flex:1"><div style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:2px">Currently shifted</div><div style="font-family:'Spectral',serif;font-size:20px;font-weight:600">{{wildshapeActiveName}}</div></div>
+        <div style="flex:1"><div style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:2px">Currently shifted</div><div style="font-family:var(--font-flavor);font-size:calc(20px * var(--scale-flavor));font-weight:600">{{wildshapeActiveName}}</div></div>
         <button sc-camel-on-click="{{revertWildshape}}" style="border:none;background:var(--accent,#8C5A2B);color:#fff;border-radius:8px;padding:9px 18px;font-size:13.5px;font-weight:600;cursor:pointer">Revert to normal form</button>
       </div>
     </sc-if>
@@ -666,7 +740,7 @@ CARD: ...</pre>
       <sc-for list="{{wildshapeForms}}" as="wf" hint-placeholder-count="3">
         <div style="background:var(--panel);border:1px solid {{wf.bc}};border-radius:12px;padding:16px 18px">
           <div style="display:flex;gap:10px;flex-wrap:wrap">
-            <div style="flex:2;min-width:160px"><div style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:4px">Form</div><input value="{{wf.name.val}}" sc-camel-on-change="{{wf.name.on}}" style="width:100%;box-sizing:border-box;border:1px solid var(--border2);border-radius:8px;padding:8px 10px;font-family:'Spectral',serif;font-size:15px;font-weight:600;background:var(--input-bg)"></div>
+            <div style="flex:2;min-width:160px"><div style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:4px">Form</div><input value="{{wf.name.val}}" sc-camel-on-change="{{wf.name.on}}" style="width:100%;box-sizing:border-box;border:1px solid var(--border2);border-radius:8px;padding:8px 10px;font-family:var(--font-flavor);font-size:calc(15px * var(--scale-flavor));font-weight:600;background:var(--input-bg)"></div>
             <div style="flex:none;width:70px"><div style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:4px">Tier</div><input type="number" value="{{wf.tier.val}}" sc-camel-on-change="{{wf.tier.on}}" style="width:100%;box-sizing:border-box;border:1px solid var(--border2);border-radius:8px;padding:8px 10px;font-size:14px;background:var(--input-bg)"></div>
             <div style="flex:none;width:80px"><div style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:4px">Evasion</div><input type="number" value="{{wf.evasion.val}}" sc-camel-on-change="{{wf.evasion.on}}" style="width:100%;box-sizing:border-box;border:1px solid var(--border2);border-radius:8px;padding:8px 10px;font-size:14px;background:var(--input-bg)"></div>
             <div style="flex:none;width:90px"><div style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:4px">Stress cost</div><input type="number" value="{{wf.stressCost.val}}" sc-camel-on-change="{{wf.stressCost.on}}" style="width:100%;box-sizing:border-box;border:1px solid var(--border2);border-radius:8px;padding:8px 10px;font-size:14px;background:var(--input-bg)"></div>
@@ -693,7 +767,7 @@ CARD: ...</pre>
   <div data-screen-label="Transformation" style="display:flex;flex-direction:column;gap:16px;max-width:820px">
     <sc-if value="{{transformationActiveBanner}}" hint-placeholder-val="{{ false }}">
       <div style="background:var(--highlight-bg);border:1px solid var(--accent,#8C5A2B);border-radius:12px;padding:14px 18px;display:flex;align-items:center;gap:14px;flex-wrap:wrap">
-        <div style="flex:1"><div style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:2px">Currently transformed</div><div style="font-family:'Spectral',serif;font-size:20px;font-weight:600">{{transformationActiveName}}</div></div>
+        <div style="flex:1"><div style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:2px">Currently transformed</div><div style="font-family:var(--font-flavor);font-size:calc(20px * var(--scale-flavor));font-weight:600">{{transformationActiveName}}</div></div>
         <button sc-camel-on-click="{{revertTransformation}}" style="border:none;background:var(--accent,#8C5A2B);color:#fff;border-radius:8px;padding:9px 18px;font-size:13.5px;font-weight:600;cursor:pointer">Revert to normal form</button>
       </div>
     </sc-if>
@@ -704,7 +778,7 @@ CARD: ...</pre>
             <div style="display:inline-block;font-size:10px;letter-spacing:0.06em;text-transform:uppercase;color:#A33B3B;border:1px solid #A33B3B;border-radius:999px;padding:3px 8px;margin-bottom:10px">{{tf.pendingBadge}}</div>
           </sc-if>
           <div style="display:flex;gap:10px;flex-wrap:wrap">
-            <div style="flex:2;min-width:160px"><div style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:4px">Form</div><input value="{{tf.name.val}}" sc-camel-on-change="{{tf.name.on}}" style="width:100%;box-sizing:border-box;border:1px solid var(--border2);border-radius:8px;padding:8px 10px;font-family:'Spectral',serif;font-size:15px;font-weight:600;background:var(--input-bg)"></div>
+            <div style="flex:2;min-width:160px"><div style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:4px">Form</div><input value="{{tf.name.val}}" sc-camel-on-change="{{tf.name.on}}" style="width:100%;box-sizing:border-box;border:1px solid var(--border2);border-radius:8px;padding:8px 10px;font-family:var(--font-flavor);font-size:calc(15px * var(--scale-flavor));font-weight:600;background:var(--input-bg)"></div>
             <div style="flex:none;width:70px"><div style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:4px">Tier</div><input type="number" value="{{tf.tier.val}}" sc-camel-on-change="{{tf.tier.on}}" style="width:100%;box-sizing:border-box;border:1px solid var(--border2);border-radius:8px;padding:8px 10px;font-size:14px;background:var(--input-bg)"></div>
             <div style="flex:none;width:80px"><div style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:4px">Evasion</div><input type="number" value="{{tf.evasion.val}}" sc-camel-on-change="{{tf.evasion.on}}" style="width:100%;box-sizing:border-box;border:1px solid var(--border2);border-radius:8px;padding:8px 10px;font-size:14px;background:var(--input-bg)"></div>
             <div style="flex:none;width:90px"><div style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:4px">Stress cost</div><input type="number" value="{{tf.stressCost.val}}" sc-camel-on-change="{{tf.stressCost.on}}" style="width:100%;box-sizing:border-box;border:1px solid var(--border2);border-radius:8px;padding:8px 10px;font-size:14px;background:var(--input-bg)"></div>
@@ -792,7 +866,7 @@ CARD: ...</pre>
   <div data-screen-label="Level up" style="display:flex;gap:20px;flex-wrap:wrap;align-items:flex-start">
     <div style="flex:1.2;min-width:320px;display:flex;flex-direction:column;gap:16px">
       <div style="background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:18px 20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap">
-        <div><div style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted)">Current level</div><div style="font-family:'Spectral',serif;font-size:32px;font-weight:600;line-height:1.1">{{c.level}} <span style="font-size:14px;color:var(--muted);font-family:system-ui,sans-serif;font-weight:400">{{tierTxt}}</span></div></div>
+        <div><div style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted)">Current level</div><div style="font-family:var(--font-flavor);font-size:calc(32px * var(--scale-flavor));font-weight:600;line-height:1.1">{{c.level}} <span style="font-size:14px;color:var(--muted);font-family:system-ui,sans-serif;font-weight:400">{{tierTxt}}</span></div></div>
         <div style="flex:1"></div>
         <button sc-camel-on-click="{{levelUp}}" style="border:none;background:var(--accent,#8C5A2B);color:#fff;border-radius:8px;padding:11px 22px;font-size:14px;font-weight:600;cursor:pointer">Level up →</button>
       </div>
@@ -826,7 +900,7 @@ CARD: ...</pre>
       <div style="background:var(--panel);border-radius:16px;width:100%;max-width:520px;max-height:86vh;overflow:auto;padding:28px 30px;box-shadow:0 20px 50px rgba(0,0,0,0.25)">
 
         <sc-if value="{{wizStep0}}" hint-placeholder-val="{{ false }}">
-          <div style="font-family:'Spectral',serif;font-size:22px;font-weight:600;margin-bottom:6px">Level Up</div>
+          <div style="font-family:var(--font-flavor);font-size:calc(22px * var(--scale-flavor));font-weight:600;margin-bottom:6px">Level Up</div>
           <p style="font-size:13.5px;color:var(--muted);margin:0 0 18px;line-height:1.5">You're about to go from level {{wizCurLevel}} to level {{wizNewLevel}} ({{wizNewTier}}). Damage thresholds will rise to {{wizNewMajor}} major / {{wizNewSevere}} severe, then you'll choose two advancements.</p>
           <div style="display:flex;gap:8px;justify-content:flex-end">
             <button sc-camel-on-click="{{wizCancel}}" style="border:1px solid var(--border2);background:var(--panel);color:var(--text);border-radius:8px;padding:9px 16px;font-size:13.5px;cursor:pointer">Cancel</button>
@@ -835,7 +909,7 @@ CARD: ...</pre>
         </sc-if>
 
         <sc-if value="{{wizStep1}}" hint-placeholder-val="{{ false }}">
-          <div style="font-family:'Spectral',serif;font-size:20px;font-weight:600;margin-bottom:4px">Choose advancement 1 of 2</div>
+          <div style="font-family:var(--font-flavor);font-size:calc(20px * var(--scale-flavor));font-weight:600;margin-bottom:4px">Choose advancement 1 of 2</div>
           <div style="font-size:12px;color:var(--muted);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:14px">Step 2 of 4</div>
           <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:18px">
             <sc-for list="{{wizOptionsA}}" as="op" hint-placeholder-count="8">
@@ -852,7 +926,7 @@ CARD: ...</pre>
         </sc-if>
 
         <sc-if value="{{wizStep2}}" hint-placeholder-val="{{ false }}">
-          <div style="font-family:'Spectral',serif;font-size:20px;font-weight:600;margin-bottom:4px">Choose advancement 2 of 2</div>
+          <div style="font-family:var(--font-flavor);font-size:calc(20px * var(--scale-flavor));font-weight:600;margin-bottom:4px">Choose advancement 2 of 2</div>
           <div style="font-size:12px;color:var(--muted);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:14px">Step 3 of 4</div>
           <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:18px">
             <sc-for list="{{wizOptionsB}}" as="op" hint-placeholder-count="8">
@@ -869,7 +943,7 @@ CARD: ...</pre>
         </sc-if>
 
         <sc-if value="{{wizStep3}}" hint-placeholder-val="{{ false }}">
-          <div style="font-family:'Spectral',serif;font-size:20px;font-weight:600;margin-bottom:4px">Confirm level {{wizNewLevel}}</div>
+          <div style="font-family:var(--font-flavor);font-size:calc(20px * var(--scale-flavor));font-weight:600;margin-bottom:4px">Confirm level {{wizNewLevel}}</div>
           <div style="font-size:12px;color:var(--muted);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:14px">Step 4 of 4</div>
           <div style="border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:18px;display:flex;flex-direction:column;gap:6px">
             <div style="font-size:13.5px"><strong>Thresholds:</strong> {{wizNewMajor}} major / {{wizNewSevere}} severe</div>
@@ -888,7 +962,7 @@ CARD: ...</pre>
   <sc-if value="{{profDoubleConfirmOpen}}" hint-placeholder-val="{{ false }}">
     <div style="position:fixed;inset:0;background:rgba(20,18,14,0.45);display:flex;align-items:center;justify-content:center;z-index:150;padding:20px">
       <div style="background:var(--panel);border-radius:16px;width:100%;max-width:400px;padding:26px 28px;box-shadow:0 20px 50px rgba(0,0,0,0.25)">
-        <div style="font-family:'Spectral',serif;font-size:19px;font-weight:600;margin-bottom:8px">Increase Proficiency again?</div>
+        <div style="font-family:var(--font-flavor);font-size:calc(19px * var(--scale-flavor));font-weight:600;margin-bottom:8px">Increase Proficiency again?</div>
         <p style="font-size:13.5px;color:var(--muted);margin:0 0 20px;line-height:1.5">Reaching this level already bumped Proficiency automatically for hitting a new tier. Picking this too means taking it twice this level — that's usually not intended, but it's your call.</p>
         <div style="display:flex;gap:8px;justify-content:flex-end">
           <button sc-camel-on-click="{{profDoubleConfirmNo}}" style="border:1px solid var(--border2);background:var(--panel);color:var(--text);border-radius:8px;padding:9px 16px;font-size:13.5px;cursor:pointer">Cancel</button>
@@ -1016,7 +1090,7 @@ CARD: ...</pre>
     <sc-if value="{{confirmDeleteOpen}}" hint-placeholder-val="{{ false }}">
       <div style="position:fixed;inset:0;background:rgba(20,18,14,0.45);display:flex;align-items:center;justify-content:center;z-index:100;padding:20px">
         <div style="background:var(--panel);border-radius:16px;width:100%;max-width:400px;padding:26px 28px;box-shadow:0 20px 50px rgba(0,0,0,0.25)">
-          <div style="font-family:'Spectral',serif;font-size:19px;font-weight:600;margin-bottom:8px">Delete {{c.name}}?</div>
+          <div style="font-family:var(--font-flavor);font-size:calc(19px * var(--scale-flavor));font-weight:600;margin-bottom:8px">Delete {{c.name}}?</div>
           <p style="font-size:13.5px;color:var(--muted);margin:0 0 20px;line-height:1.5">This permanently removes the character, their companions, and their level-up history. This can't be undone.</p>
           <div style="display:flex;gap:8px;justify-content:flex-end">
             <button sc-camel-on-click="{{cancelDeleteChar}}" style="border:1px solid var(--border2);background:var(--panel);color:var(--text);border-radius:8px;padding:9px 16px;font-size:13.5px;cursor:pointer">Cancel</button>

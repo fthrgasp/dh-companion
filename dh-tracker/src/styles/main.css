@@ -35,3 +35,34 @@ input,select,textarea,button{font-family:inherit;color:var(--text,#26221b)}
 }
 
 #app-root{min-height:100vh}
+
+@font-face{
+  font-family:'Thessamere Old Hand';
+  src:url('../assets/fonts/ThessamereOldHand-Regular-kerned_1.otf') format('opentype');
+  font-weight:normal;
+  font-style:normal;
+  font-display:swap;
+}
+@font-face{
+  font-family:'Thessamere Common Hand';
+  src:url('../assets/fonts/ThessamereCommonHand-Regular.otf') format('opentype');
+  font-weight:normal;
+  font-style:normal;
+  font-display:swap;
+}
+
+:root{
+  --font-flavor:'Thessamere Old Hand', Georgia, serif;
+  --font-body:'Thessamere Common Hand', 'Segoe UI', system-ui, sans-serif;
+  --font-chrome:'Segoe UI', system-ui, sans-serif;
+  --scale-flavor:1.55;
+  --scale-body:2;
+  --scale-body-recap:1.6;
+}
+body.fonts-off{
+  --font-flavor:var(--font-chrome);
+  --font-body:var(--font-chrome);
+  --scale-flavor:1;
+  --scale-body:1;
+  --scale-body-recap:1;
+}

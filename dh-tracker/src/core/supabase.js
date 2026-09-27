@@ -245,7 +245,7 @@ export const authGateTemplate = `
 <sc-if value="{{showAuthGate}}" hint-placeholder-val="{{ false }}">
 <div data-screen-label="Sign In" style="max-width:400px;margin:0 auto;padding:80px 32px">
   <div style="background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:32px;box-shadow:0 1px 3px rgba(38,34,27,0.06)">
-    <h1 style="font-family:'Spectral',serif;font-weight:600;font-size:24px;margin:0 0 6px">Sign in</h1>
+    <h1 style="font-family:var(--font-flavor);font-weight:600;font-size:calc(24px * var(--scale-flavor));margin:0 0 6px">Sign in</h1>
     <p style="font-size:13px;color:var(--muted);margin:0 0 20px">Sign in to sync your characters across devices. We'll email you a magic link — no password needed.</p>
     <sc-if value="{{authMagicLinkSent}}" hint-placeholder-val="{{ false }}">
       <p style="font-size:13.5px;color:var(--text)">Check your email for a sign-in link.</p>
@@ -267,7 +267,7 @@ export const authGateTemplate = `
 <sc-if value="{{localImportOpen}}" hint-placeholder-val="{{ false }}">
   <div style="position:fixed;inset:0;z-index:200;background:rgba(38,34,27,0.45);display:flex;align-items:center;justify-content:center;padding:24px">
     <div style="max-width:420px;background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:26px;box-shadow:0 8px 24px rgba(38,34,27,0.25)">
-      <h2 style="font-family:'Spectral',serif;font-weight:600;font-size:19px;margin:0 0 10px">Import local characters?</h2>
+      <h2 style="font-family:var(--font-flavor);font-weight:600;font-size:calc(19px * var(--scale-flavor));margin:0 0 10px">Import local characters?</h2>
       <p style="font-size:13.5px;color:var(--muted);margin:0 0 20px">This browser has {{localImportCount}} character(s) saved locally that aren't in your account yet. Import them now, or start fresh with an empty roster.</p>
       <div style="display:flex;gap:10px;justify-content:flex-end">
         <button sc-camel-on-click="{{dismissLocalImport}}" style="border:1px solid var(--border2);background:var(--panel);color:var(--text);border-radius:8px;padding:9px 14px;font-size:13px;cursor:pointer">Start fresh</button>

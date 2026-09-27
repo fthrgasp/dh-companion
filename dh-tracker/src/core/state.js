@@ -1,6 +1,6 @@
 import { loadJSON, saveJSON, loadRaw, saveRaw } from './storage.js';
 
-export const APP_VERSION = '0.12.1';
+export const APP_VERSION = '0.12.4';
 
 export const initialState = {
   screen: 'roster', activeId: null, tab: 'play',
@@ -22,7 +22,8 @@ export const initialState = {
   creatures: [], newCreatureName: '',
   session: null, authChecked: false, skipAuth: false, authEmail: '', authMagicLinkSent: false, authError: '',
   localImportPrompt: null,
-  pendingJoinId: null, joinError: '', shareLinkCopied: false, sharingCampaign: false
+  pendingJoinId: null, joinError: '', shareLinkCopied: false, sharingCampaign: false,
+  fontsOff: loadRaw('dh-tracker-fonts-off') === '1'
 };
 
 export const stateMixin = {
@@ -118,6 +119,15 @@ export const stateMixin = {
     const dark = !this.state.dark;
     saveRaw(this.gk('dh-tracker-dark'), dark ? '1' : '0');
     this.setState({ dark });
+  },
+
+  // Device-specific reading preference (not gk()-scoped like the rest of
+  // this file's saves) — deliberately not synced per-campaign or per-account
+  // so it can't become a point of contention among players sharing a login.
+  toggleFontsOff() {
+    const fontsOff = !this.state.fontsOff;
+    saveRaw('dh-tracker-fonts-off', fontsOff ? '1' : '0');
+    this.setState({ fontsOff });
   },
 
   loadThemeFor(gameId) {

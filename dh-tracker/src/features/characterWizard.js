@@ -98,14 +98,14 @@ export const wizardTemplate = `
   <div style="position:fixed;inset:0;background:rgba(20,18,14,0.55);display:flex;align-items:center;justify-content:center;z-index:300;padding:20px">
     <div style="background:var(--panel);border-radius:16px;width:100%;max-width:560px;max-height:88vh;overflow:auto;padding:28px 30px;box-shadow:0 24px 60px rgba(0,0,0,0.3);display:flex;flex-direction:column;gap:16px">
       <div style="display:flex;justify-content:space-between;align-items:baseline">
-        <div style="font-family:'Spectral',serif;font-size:22px;font-weight:600">Guided character creation</div>
+        <div style="font-family:var(--font-flavor);font-size:calc(22px * var(--scale-flavor));font-weight:600">Guided character creation</div>
         <button sc-camel-on-click="{{wizNewCancel}}" style="border:none;background:none;color:var(--muted);cursor:pointer;font-size:16px">✕</button>
       </div>
       <div style="font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--accent,#8C5A2B)">{{wizStepLabel}}</div>
 
       <sc-if value="{{wizIsStep.0}}" hint-placeholder-val="{{ false }}">
         <div style="display:flex;flex-direction:column;gap:14px">
-          <div style="font-family:'Spectral',serif;font-size:19px;font-weight:600">What level is this character starting at?</div>
+          <div style="font-family:var(--font-flavor);font-size:calc(19px * var(--scale-flavor));font-weight:600">What level is this character starting at?</div>
           <div style="font-size:13px;color:var(--muted)">Most new characters start at level 1. If your table is starting higher — joining an existing party, a one-shot, etc. — set it here and everything else (HP, Proficiency, thresholds, domain cards) will be built to match automatically.</div>
           <div style="display:flex;gap:10px">
             <button sc-camel-on-click="{{wizPickLevel1}}" style="flex:1;border:1px solid {{wizLevel1BorderColor}};background:{{wizLevel1Bg}};color:var(--text);border-radius:10px;padding:16px;font-size:15px;font-weight:600;cursor:pointer">Level 1<div style="font-size:12px;font-weight:400;color:var(--muted);margin-top:4px">Standard start</div></button>
@@ -309,7 +309,7 @@ export const wizardTemplate = `
 
       <sc-if value="{{wizIsStep.11}}" hint-placeholder-val="{{ false }}">
         <div style="display:flex;flex-direction:column;gap:8px">
-          <div style="font-family:'Spectral',serif;font-size:19px;font-weight:600">{{wizReviewName}}</div>
+          <div style="font-family:var(--font-flavor);font-size:calc(19px * var(--scale-flavor));font-weight:600">{{wizReviewName}}</div>
           <div style="font-size:13px;color:var(--muted)">{{wizReviewLevelLine}}</div>
           <div style="font-size:13px;color:var(--muted)">{{wizReviewLine2}}</div>
           <div style="font-size:13px;color:var(--muted)">{{wizReviewLine3}}</div>

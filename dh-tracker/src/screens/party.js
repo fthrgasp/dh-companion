@@ -26,8 +26,8 @@ export const partyTemplate = `
 <sc-if value="{{isParty}}" hint-placeholder-val="{{ false }}">
 <div data-screen-label="Shared Inventory" style="max-width:820px;margin:0 auto;padding:48px 32px">
   <div style="display:flex;align-items:center;gap:14px;border-bottom:2px solid var(--text);padding-bottom:14px;margin-bottom:20px">
-    <button sc-camel-on-click="{{goRoster}}" style="border:1px solid var(--border2);background:var(--panel);color:var(--text);border-radius:8px;padding:8px 14px;font-size:13px;cursor:pointer" style-hover="border-color:var(--text)">← Roster</button>
-    <h1 style="font-family:'Spectral',serif;font-weight:600;font-size:30px;margin:0;letter-spacing:-0.01em;flex:1">Shared Inventory</h1>
+    <button sc-camel-on-click="{{goRoster}}" style="border:1px solid var(--border2);background:var(--panel);color:var(--text);border-radius:8px;padding:8px 14px;font-size:13px;cursor:pointer;font-family:var(--font-chrome)" style-hover="border-color:var(--text)">← Roster</button>
+    <h1 style="font-family:var(--font-flavor);font-weight:600;font-size:calc(30px * var(--scale-flavor));margin:0;letter-spacing:-0.01em;flex:1">Shared Inventory</h1>
   </div>
   <p style="font-size:13px;color:var(--muted);margin:0 0 18px">Party-wide gear, potions, and loot the whole table can see. Tap a holder chip to cycle who's carrying it.</p>
   <div style="display:flex;flex-direction:column;gap:10px">
@@ -39,7 +39,7 @@ export const partyTemplate = `
         </div>
         <div style="display:flex;align-items:center;gap:8px">
           <button sc-camel-on-click="{{pi.dec}}" style="width:28px;height:28px;border:1px solid var(--border2);background:var(--panel);color:var(--text);border-radius:7px;cursor:pointer;font-size:15px">−</button>
-          <span style="width:26px;text-align:center;font-family:'Spectral',serif;font-size:19px;font-weight:600">{{pi.qty}}</span>
+          <span style="width:26px;text-align:center;font-family:var(--font-flavor);font-size:calc(19px * var(--scale-flavor));font-weight:600">{{pi.qty}}</span>
           <button sc-camel-on-click="{{pi.inc}}" style="width:28px;height:28px;border:1px solid var(--border2);background:var(--panel);color:var(--text);border-radius:7px;cursor:pointer;font-size:15px">+</button>
         </div>
         <button sc-camel-on-click="{{pi.cycleHolder}}" style="border:1px solid var(--border2);background:var(--highlight-bg);color:var(--text);border-radius:999px;padding:6px 14px;font-size:12.5px;cursor:pointer" style-hover="border-color:var(--accent,#8C5A2B)">{{pi.holder}}</button>

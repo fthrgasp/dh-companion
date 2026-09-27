@@ -256,6 +256,27 @@ export const compendiumMixin = {
     ];
   },
 
+  // Flattens every named weapon already known to the app (every class's
+  // starting weapons, plus the generic wizard presets) into one deduped
+  // name -> range/damage lookup, so typing a known weapon's name anywhere
+  // (currently: the Gear tab's weapon rows) can pull its stats instead of
+  // always defaulting to Melee with blank damage. Void "pending" placeholders
+  // are excluded since they have no real stats to offer.
+  weaponTable() {
+    const cd = this.classData();
+    const seen = new Set();
+    const out = [];
+    const add = w => {
+      const key = (w.name || '').trim().toLowerCase();
+      if (!key || seen.has(key) || key.indexOf('pending') !== -1) return;
+      seen.add(key);
+      out.push({ name: w.name, range: w.range, damage: w.damage });
+    };
+    Object.keys(cd).forEach(k => (cd[k].weapons || []).forEach(add));
+    this.weaponPresets().forEach(add);
+    return out;
+  },
+
   armorPresets() {
     return [
       { id: 'light', name: 'Leather armor', score: 3 },

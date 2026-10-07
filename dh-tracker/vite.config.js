@@ -4,8 +4,6 @@ import { defineConfig } from 'vite';
 // not the domain root), so asset URLs need this prefix or the built JS/CSS/
 // font files 404 in production. `npm run dev` is unaffected — Vite only
 // applies `base` to the production build, not the dev server.
-export default defineConfig({
-  // dh-tracker/vite.config.js
 import { defineConfig } from 'vite';
 
 export default defineConfig({

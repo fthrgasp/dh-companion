@@ -5,5 +5,6 @@ import { defineConfig } from 'vite';
 // font files 404 in production. `npm run dev` is unaffected — Vite only
 // applies `base` to the production build, not the dev server.
 export default defineConfig({
-  base: '/dh-companion/'
+  //base: '/dh-companion/'
+  base: '/'
 });

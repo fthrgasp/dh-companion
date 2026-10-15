@@ -2,6 +2,11 @@
 
 All notable changes to the Daggerheart Tracker are logged here. Format loosely follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [0.13.1] — 2026-10-14
+
+### Added
+- **Sign in with an emailed code, inside the app.** After requesting a sign-in email, there's now a code field (with iOS one-time-code autofill) alongside the magic link. iOS home-screen apps keep their own storage separate from Safari, and the emailed link always opens in Safari, so signing in by link never reached the home-screen copy. Typing the code keeps the whole flow in one place. The link still works as before. Requires adding `{{ .Token }}` to the Supabase "Magic Link" email template so the email includes the code.
+
 ## [0.13.0] — 2026-10-14
 
 ### Added

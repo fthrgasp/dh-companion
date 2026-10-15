@@ -70,6 +70,26 @@ export const supabaseMixin = {
     });
   },
 
+  setAuthCode(code) { this.setState({ authCode: (code || '').replace(/\s+/g, ''), authError: '' }); },
+
+  // Lets someone finish signing in inside the app itself — needed for iOS
+  // home-screen apps, which have their own storage: the emailed link always
+  // opens in Safari, so a session created there never reaches the home-screen
+  // copy. Typing the emailed code here keeps everything in one place.
+  verifyCode() {
+    if (!supabaseClient) { this.setState({ authError: 'Supabase failed to load — check your connection.' }); return; }
+    const email = (this.state.authEmail || '').trim();
+    const token = (this.state.authCode || '').trim();
+    if (!email || !token || this.state.authVerifying) return;
+    this.setState({ authVerifying: true, authError: '' });
+    supabaseClient.auth.verifyOtp({ email, token, type: 'email' }).then(({ error }) => {
+      if (error) this.setState({ authVerifying: false, authError: error.message });
+      else this.setState({ authVerifying: false, authCode: '' });
+    }).catch(e => this.setState({ authVerifying: false, authError: (e && e.message) || 'Could not verify that code.' }));
+  },
+
+  restartSignIn() { this.setState({ authMagicLinkSent: false, authCode: '', authError: '' }); },
+
   signOut() {
     if (supabaseClient) supabaseClient.auth.signOut();
     this.setState({ session: null });
@@ -252,16 +272,22 @@ export const authGateTemplate = `
 <div data-screen-label="Sign In" style="max-width:400px;margin:0 auto;padding:80px 32px">
   <div style="background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:32px;box-shadow:0 1px 3px rgba(38,34,27,0.06)">
     <h1 style="font-family:var(--font-flavor);font-weight:600;font-size:calc(24px * var(--scale-flavor));margin:0 0 6px">Sign in</h1>
-    <p style="font-size:13px;color:var(--muted);margin:0 0 20px">Sign in to sync your characters across devices. We'll email you a magic link — no password needed.</p>
+    <p style="font-size:13px;color:var(--muted);margin:0 0 20px">Sign in to sync your characters across devices. We'll email you a sign-in code and link — no password needed.</p>
     <sc-if value="{{authMagicLinkSent}}" hint-placeholder-val="{{ false }}">
-      <p style="font-size:13.5px;color:var(--text)">Check your email for a sign-in link.</p>
+      <p style="font-size:13.5px;color:var(--text);margin:0 0 12px">Check your email. Type the code below to sign in right here, or tap the link in the email (the link opens in Safari, so use the code if you're on a home-screen app).</p>
+      <input type="text" inputmode="numeric" autocomplete="one-time-code" value="{{authCode}}" sc-camel-on-change="{{setAuthCode}}" placeholder="Code from the email" style="width:100%;box-sizing:border-box;border:1px solid var(--border2);border-radius:8px;padding:10px 12px;font-size:18px;letter-spacing:0.15em;text-align:center;background:var(--input-bg);margin-bottom:10px">
+      <sc-if value="{{authErrorOpen}}" hint-placeholder-val="{{ false }}">
+        <p style="font-size:12.5px;color:#A33B3B;margin:0 0 10px">{{authErrorText}}</p>
+      </sc-if>
+      <button sc-camel-on-click="{{verifyCode}}" style="width:100%;border:none;background:var(--accent,#8C5A2B);color:#fff;border-radius:8px;padding:10px;font-size:14px;font-weight:600;cursor:pointer">{{authVerifyLabel}}</button>
+      <button sc-camel-on-click="{{restartSignIn}}" style="width:100%;border:none;background:none;color:var(--muted);padding:10px 0 0;font-size:12.5px;cursor:pointer;text-decoration:underline">Use a different email / send a new code</button>
     </sc-if>
     <sc-if value="{{authFormOpen}}" hint-placeholder-val="{{ true }}">
       <input type="email" value="{{authEmail}}" sc-camel-on-change="{{setAuthEmail}}" placeholder="you@example.com" style="width:100%;box-sizing:border-box;border:1px solid var(--border2);border-radius:8px;padding:10px 12px;font-size:14px;background:var(--input-bg);margin-bottom:10px">
       <sc-if value="{{authErrorOpen}}" hint-placeholder-val="{{ false }}">
         <p style="font-size:12.5px;color:#A33B3B;margin:0 0 10px">{{authErrorText}}</p>
       </sc-if>
-      <button sc-camel-on-click="{{sendMagicLink}}" style="width:100%;border:none;background:var(--accent,#8C5A2B);color:#fff;border-radius:8px;padding:10px;font-size:14px;font-weight:600;cursor:pointer">Send magic link</button>
+      <button sc-camel-on-click="{{sendMagicLink}}" style="width:100%;border:none;background:var(--accent,#8C5A2B);color:#fff;border-radius:8px;padding:10px;font-size:14px;font-weight:600;cursor:pointer">Email me a sign-in code</button>
     </sc-if>
     <div style="height:1px;background:var(--border3);margin:20px 0"></div>
     <button sc-camel-on-click="{{skipAuthClick}}" style="width:100%;border:1px solid var(--border2);background:var(--panel);color:var(--text);border-radius:8px;padding:9px;font-size:13px;cursor:pointer">Continue without an account (this device only)</button>

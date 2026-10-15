@@ -1,6 +1,6 @@
 import { loadJSON, saveJSON, loadRaw, saveRaw } from './storage.js';
 
-export const APP_VERSION = '0.13.0';
+export const APP_VERSION = '0.13.1';
 
 export const initialState = {
   screen: 'roster', activeId: null, tab: 'play',
@@ -20,7 +20,7 @@ export const initialState = {
   games: [{ id: 'default', name: 'My Campaign' }], activeGame: 'default', newGameName: '', gameMenuOpen: false,
   editingGameId: null, renameGameVal: '',
   creatures: [], newCreatureName: '',
-  session: null, authChecked: false, skipAuth: false, authEmail: '', authMagicLinkSent: false, authError: '',
+  session: null, authChecked: false, skipAuth: false, authEmail: '', authMagicLinkSent: false, authError: '', authCode: '', authVerifying: false,
   localImportPrompt: null,
   pendingJoinId: null, joinError: '', shareLinkCopied: false, sharingCampaign: false,
   fontsOff: loadRaw('dh-tracker-fonts-off') === '1'

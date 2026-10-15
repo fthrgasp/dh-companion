@@ -1,6 +1,6 @@
 import { loadJSON, saveJSON, loadRaw, saveRaw } from './storage.js';
 
-export const APP_VERSION = '0.13.2';
+export const APP_VERSION = '0.13.3';
 
 export const initialState = {
   screen: 'roster', activeId: null, tab: 'play',
@@ -55,6 +55,7 @@ export const stateMixin = {
     } else {
       chars = get('dh-tracker-v1') || [];
     }
+    chars.forEach(ch => this.normalizeChar(ch));
     let sessionElapsed = parseInt(loadRaw('dh-tracker-session-elapsed' + suffix), 10) || 0;
     return {
       chars,
@@ -154,9 +155,21 @@ export const stateMixin = {
       const chars = JSON.parse(JSON.stringify(s.chars));
       const c = chars.find(x => x.id === s.activeId);
       if (c) fn(c, chars);
+      this.stampChanged(chars, s.chars);
       this.save(chars);
       this.syncCharsRemote(chars, s.chars);
       return { chars };
+    });
+  },
+
+  // Gives every character that differs from its previous version a fresh
+  // updatedAt, which is what lets cloud sync tell a newer copy from a stale one.
+  stampChanged(chars, prev) {
+    const old = new Map((prev || []).map(p => [p.id, JSON.stringify(p)]));
+    const now = Date.now();
+    chars.forEach(c => {
+      const o = old.get(c.id);
+      if (o === undefined || o !== JSON.stringify(c)) c.updatedAt = now;
     });
   },
 
@@ -164,6 +177,7 @@ export const stateMixin = {
     this.setState(s => {
       const chars = JSON.parse(JSON.stringify(s.chars));
       fn(chars);
+      this.stampChanged(chars, s.chars);
       this.save(chars);
       this.syncCharsRemote(chars, s.chars);
       return { chars };

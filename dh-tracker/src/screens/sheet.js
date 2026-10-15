@@ -342,7 +342,7 @@ export const sheetTemplate = `
             <div style="flex:none;width:10px;align-self:stretch;border-radius:5px;background:{{cd.chip}}"></div>
             <div style="flex:1">
               <div style="display:flex;gap:10px;align-items:baseline;flex-wrap:wrap"><span style="font-family:var(--font-flavor);font-size:calc(17px * var(--scale-flavor));font-weight:600">{{cd.name}}</span><span style="font-family:var(--font-body);font-size:calc(11.5px * var(--scale-body));color:var(--muted);letter-spacing:0.05em;text-transform:uppercase">{{cd.meta}}</span></div>
-              <div style="font-family:var(--font-chrome);font-size:13.5px;color:var(--text);opacity:0.85;margin-top:4px;line-height:1.45">{{cd.text}}</div>
+              <div style="font-family:var(--font-chrome);font-size:13.5px;color:var(--text);opacity:0.85;margin-top:4px;line-height:1.45;white-space:pre-wrap">{{cd.text}}</div>
               <div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border3)">
                 <sc-if value="{{cd.tokensOff}}" hint-placeholder-val="{{ true }}">
                   <button sc-camel-on-click="{{cd.toggleTokens}}" style="border:1px dashed var(--border2);background:none;color:var(--muted);border-radius:7px;padding:4px 10px;font-size:11.5px;cursor:pointer;font-family:var(--font-chrome)" style-hover="border-color:var(--accent,#8C5A2B);color:var(--accent,#8C5A2B)">+ Track tokens</button>
@@ -384,7 +384,7 @@ export const sheetTemplate = `
             <div style="flex:none;width:10px;align-self:stretch;border-radius:5px;background:{{cd.chip}}"></div>
             <div style="flex:1">
               <div style="display:flex;gap:10px;align-items:baseline;flex-wrap:wrap"><span style="font-family:var(--font-flavor);font-size:calc(16px * var(--scale-flavor));font-weight:600">{{cd.name}}</span><span style="font-family:var(--font-body);font-size:calc(11.5px * var(--scale-body));color:var(--muted);letter-spacing:0.05em;text-transform:uppercase">{{cd.meta}}</span></div>
-              <div style="font-family:var(--font-chrome);font-size:13px;color:var(--text);margin-top:4px;line-height:1.45">{{cd.text}}</div>
+              <div style="font-family:var(--font-chrome);font-size:13px;color:var(--text);margin-top:4px;line-height:1.45;white-space:pre-wrap">{{cd.text}}</div>
               <div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border3)">
                 <sc-if value="{{cd.tokensOff}}" hint-placeholder-val="{{ true }}">
                   <button sc-camel-on-click="{{cd.toggleTokens}}" style="border:1px dashed var(--border2);background:none;color:var(--muted);border-radius:7px;padding:4px 10px;font-size:11.5px;cursor:pointer;font-family:var(--font-chrome)" style-hover="border-color:var(--accent,#8C5A2B);color:var(--accent,#8C5A2B)">+ Track tokens</button>

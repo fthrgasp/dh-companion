@@ -30,6 +30,9 @@ export const supabaseMixin = {
   refreshCharsFromRemote(gameId, opts) {
     opts = opts || {};
     this.loadCharsRemote(gameId).then(remoteChars => {
+      // A failed request (null) or a campaign switch while this was in
+      // flight must not touch what's on screen.
+      if (remoteChars === null || this.state.activeGame !== gameId) return;
       const localChars = this.loadGameData(gameId).chars || [];
       if (opts.checkImport && remoteChars.length === 0 && localChars.length) {
         this.setState({ localImportPrompt: { gameId, count: localChars.length, chars: localChars } });
@@ -39,10 +42,17 @@ export const supabaseMixin = {
       // (created moments ago, or synced while offline) must never vanish
       // just because this particular fetch didn't see it in the cloud yet —
       // that previously nuked characters silently on any reload/game-switch
-      // whenever the remote copy was incomplete. Local wins on id collisions
-      // since it's what the player is actively looking at.
+      // whenever the remote copy was incomplete. On an id collision the copy
+      // with the newer updatedAt wins, so a stale device picks up edits made
+      // elsewhere instead of overwriting them on its next save.
+      const remoteById = new Map(remoteChars.map(c => [c.id, c]));
       const localIds = new Set(localChars.map(c => c.id));
-      const merged = localChars.concat(remoteChars.filter(c => !localIds.has(c.id)));
+      const merged = localChars.map(l => {
+        const r = remoteById.get(l.id);
+        return (r && (r.updatedAt || 0) > (l.updatedAt || 0)) ? r : l;
+      }).concat(remoteChars.filter(c => !localIds.has(c.id)));
+      merged.forEach(c => this.normalizeChar(c));
+      this.save(merged);
       this.setState({ chars: merged });
     });
   },
@@ -109,10 +119,10 @@ export const supabaseMixin = {
     if (!supabaseClient) return Promise.resolve([]);
     return supabaseClient.from('party_items').select('id,data').eq('game_id', cloudId)
       .then(({ data, error }) => {
-        if (error) { console.error('loadPartyRemote', error); return []; }
+        if (error) { console.error('loadPartyRemote', error); return null; }
         return (data || []).map(row => Object.assign({}, row.data, { id: row.id }));
       })
-      .catch(e => { console.error('loadPartyRemote', e); return []; });
+      .catch(e => { console.error('loadPartyRemote', e); return null; });
   },
 
   savePartyItemRemote(item, cloudId) {
@@ -133,13 +143,17 @@ export const supabaseMixin = {
     const cloudId = this.activeCloudId();
     if (!this.state.session || !cloudId) return;
     const nextIds = new Set((party || []).map(p => p.id));
-    (party || []).forEach(p => this.savePartyItemRemote(p, cloudId));
+    const prevJson = new Map((prevParty || []).map(p => [p.id, JSON.stringify(p)]));
+    (party || []).forEach(p => { if (prevJson.get(p.id) !== JSON.stringify(p)) this.savePartyItemRemote(p, cloudId); });
     (prevParty || []).forEach(p => { if (!nextIds.has(p.id)) this.deletePartyItemRemote(p.id); });
   },
 
   refreshPartyFromRemote(cloudId) {
     if (!cloudId) return;
-    this.loadPartyRemote(cloudId).then(party => this.setState({ party }));
+    this.loadPartyRemote(cloudId).then(party => {
+      if (party === null || this.activeCloudId() !== cloudId) return;
+      this.setState({ party });
+    });
   },
 
   // Creates the server-side campaign row + membership for the active local
@@ -229,14 +243,16 @@ export const supabaseMixin = {
   // --- Remote (Supabase) character persistence — only used while signed in.
   // localStorage stays the source of truth when signed out, so the app keeps
   // working offline/unauthenticated exactly as it always has.
+  // Resolves to null (not []) when the request fails, so callers can tell
+  // "the cloud has nothing" apart from "we couldn't reach the cloud".
   loadCharsRemote(gameId) {
-    if (!supabaseClient) return Promise.resolve([]);
+    if (!supabaseClient) return Promise.resolve(null);
     return supabaseClient.from('characters').select('id,data').eq('game_id', gameId)
       .then(({ data, error }) => {
-        if (error) { console.error('loadCharsRemote', error); return []; }
+        if (error) { console.error('loadCharsRemote', error); return null; }
         return (data || []).map(row => Object.assign({}, row.data, { id: row.id }));
       })
-      .catch(e => { console.error('loadCharsRemote', e); return []; });
+      .catch(e => { console.error('loadCharsRemote', e); return null; });
   },
 
   saveCharRemote(char, gameId) {
@@ -246,9 +262,9 @@ export const supabaseMixin = {
       .catch(e => console.error('saveCharRemote', e));
   },
 
-  deleteCharRemote(id) {
+  deleteCharRemote(id, gameId) {
     if (!supabaseClient) return Promise.resolve();
-    return supabaseClient.from('characters').delete().eq('id', id)
+    return supabaseClient.from('characters').delete().eq('id', id).eq('game_id', gameId)
       .then(({ error }) => { if (error) console.error('deleteCharRemote', error); })
       .catch(e => console.error('deleteCharRemote', e));
   },
@@ -261,8 +277,11 @@ export const supabaseMixin = {
     if (!this.state.session) return;
     const gameId = this.state.activeGame;
     const nextIds = new Set((chars || []).map(c => c.id));
-    (chars || []).forEach(c => this.saveCharRemote(c, gameId));
-    (prevChars || []).forEach(c => { if (!nextIds.has(c.id)) this.deleteCharRemote(c.id); });
+    const prevJson = new Map((prevChars || []).map(c => [c.id, JSON.stringify(c)]));
+    // Only push characters that actually changed — re-uploading every
+    // character on every edit let a stale device clobber newer cloud copies.
+    (chars || []).forEach(c => { if (prevJson.get(c.id) !== JSON.stringify(c)) this.saveCharRemote(c, gameId); });
+    (prevChars || []).forEach(c => { if (!nextIds.has(c.id)) this.deleteCharRemote(c.id, gameId); });
   }
 };
 

@@ -2,6 +2,26 @@
 
 All notable changes to the Daggerheart Tracker are logged here. Format loosely follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [0.13.3] — 2026-10-15
+
+Fixes from a multi-agent bug review (87 confirmed findings; this release covers the data-loss and high-severity ones plus a few cheap ones).
+
+### Fixed
+- **Guided creation lost the weapon you picked.** The 0.12.3 "ghost weapons" cleanup deleted the wizard's weapon pick before it could be migrated. The wizard now writes the real weapon lists, and `normalizeChar` carries a legacy weapon into an empty list instead of discarding it, so characters already created this way get their weapon back.
+- **Cloud sync could overwrite newer data from a stale device.** Every edit re-uploaded every character, and local copies always beat cloud copies. Characters now carry an `updatedAt`; only characters that actually changed are uploaded, and on load the newer copy wins. Party items are uploaded only when changed too.
+- **A slow cloud load could land in the wrong campaign.** Results are ignored if you've switched campaigns since the request started, and a failed request no longer looks like "the cloud is empty".
+- **Cloud deletes could remove a same-id character in another campaign** (now scoped by campaign).
+- **Cloud characters pulled on a new device are now saved locally**, so they're still there offline.
+- **Importing a minimal or hand-edited character no longer crashes the app.** `normalizeChar` fills in every missing top-level field, and it now runs on everything loaded from storage.
+- **Storage-full warning.** If the browser refuses to save (usually photos filling its storage), a red banner says so instead of silently losing changes.
+- **Deleting a campaign asks first**, naming the campaign and how many characters it holds.
+- **Guests can get back to sign-in** from a "Sign in" button on the roster.
+- Recap and domain-card text keep their line breaks.
+- iPhone/iPad no longer zoom into fields when you tap them (inputs are 16px on touch screens).
+
+### Known, not yet fixed
+Session timer pauses when the device sleeps; whole-page re-render every second while the timer runs (resets scroll in modals); photos are stored at full size; a few rules/UX issues from the review (see the review notes).
+
 ## [0.13.2] — 2026-10-14
 
 ### Changed

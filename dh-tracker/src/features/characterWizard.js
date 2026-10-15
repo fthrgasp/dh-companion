@@ -83,7 +83,8 @@ export const characterWizardMixin = {
       hp: { max: cd.hp + scale.hpBonus, marked: 0 }, stress: { max: 6, marked: 0 }, hope: { max: 6, marked: 2 },
       armor: { max: w.armorScore, marked: 0 }, thresholds: scale.thresholds,
       cards, experiences, backstory, inventory: w.inventoryText,
-      weapons: { primary: { name: w.weaponName, range: w.weaponRange, damage: w.weaponDamage }, secondaryEnabled: false, secondary: { name: '', range: 'Melee', damage: '' } },
+      weaponsPrimary: w.weaponName ? [{ name: w.weaponName, range: w.weaponRange, damage: w.weaponDamage, equipped: true, features: [] }] : [],
+      weaponsSecondary: [],
       equippedArmor: { name: w.armorName, score: w.armorScore, features: [] }, armorScore: w.armorScore,
       companions, activeCompanion: 0
     });

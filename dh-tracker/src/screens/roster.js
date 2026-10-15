@@ -319,6 +319,9 @@ export const rosterTemplate = `
       <span title="Build version — check the README changelog to see if a newer one is available" style="font-size:10.5px;color:var(--muted);background:var(--panel);border:1px solid var(--border2);border-radius:999px;padding:2px 8px;white-space:nowrap">{{appVersion}}</span>
     </div>
     <div style="position:relative;flex-shrink:0">
+      <sc-if value="{{showSignInButton}}" hint-placeholder-val="{{ false }}">
+        <button sc-camel-on-click="{{openSignIn}}" title="Sign in to sync your characters" style="border:1px solid var(--border2);background:var(--panel);color:var(--text);border-radius:8px;padding:8px 14px;font-size:13px;cursor:pointer" style-hover="border-color:var(--text)">Sign in</button>
+      </sc-if>
       <sc-if value="{{hasSession}}" hint-placeholder-val="{{ false }}">
         <button sc-camel-on-click="{{signOut}}" title="Sign out" style="border:1px solid var(--border2);background:var(--panel);color:var(--text);border-radius:8px;padding:8px 14px;font-size:13px;cursor:pointer" style-hover="border-color:var(--text)">Sign out</button>
       </sc-if>

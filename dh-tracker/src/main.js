@@ -24,6 +24,12 @@ const appTemplate = `
     <button sc-camel-on-click="{{dismissUpdate}}" style="border:none;background:none;color:#fff;opacity:0.8;cursor:pointer;font-size:12.5px;text-decoration:underline">Not now</button>
   </div>
 </sc-if>
+<sc-if value="{{saveFailed}}" hint-placeholder-val="{{ false }}">
+  <div data-print-hide="1" style="position:sticky;top:0;z-index:101;background:#A33B3B;color:#fff;padding:9px 16px;display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap;font-size:13px">
+    <span>This device couldn't save your latest changes (its storage may be full). Use Export JSON on your sheets so nothing is lost, and remove large photos.</span>
+    <button sc-camel-on-click="{{dismissSaveFailed}}" style="border:none;background:none;color:#fff;opacity:0.85;cursor:pointer;font-size:12.5px;text-decoration:underline">Dismiss</button>
+  </div>
+</sc-if>
 ` + authGateTemplate + rosterTemplate + partyTemplate + recapsTemplate + companionCompendiumTemplate + creaturesTemplate + sheetTemplate + undoToastTemplate + importErrorToastTemplate + joinErrorToastTemplate + importConflictModalTemplate + wizardTemplate + `
 </div>
 `;
@@ -53,6 +59,10 @@ class Component extends DCLogic {
       updateVersion: s.updateVersion,
       reloadForUpdate: () => { location.href = location.pathname + '?_=' + Date.now(); },
       dismissUpdate: () => this.setState({ updateAvailable: false }),
+      saveFailed: !!s.saveFailed,
+      dismissSaveFailed: () => this.setState({ saveFailed: false }),
+      showSignInButton: !!supabaseClient && !s.session && !!s.authChecked,
+      openSignIn: () => this.setSkipAuth(false),
       pipRad: pipShape === 'diamond' ? '3px' : '999px',
       pipRot: pipShape === 'diamond' ? 'rotate(45deg)' : 'none',
       bg: theme.bg, panelBg: theme.panel, borderC: theme.border, border2C: theme.border2,
@@ -177,7 +187,11 @@ class Component extends DCLogic {
           this.setState({ editingGameId: null, renameGameVal: '' });
         },
         select: () => this.switchGame(g.id),
-        remove: (e) => { e.stopPropagation(); this.deleteGame(g.id); }
+        remove: (e) => {
+          e.stopPropagation();
+          const n = ((g.id === s.activeGame ? s.chars : (this.loadGameData(g.id).chars || [])) || []).length;
+          if (window.confirm('Delete the campaign "' + g.name + '"' + (n ? ' and its ' + n + ' character' + (n === 1 ? '' : 's') : '') + ' from this device? Export the characters first if you want to keep them.')) this.deleteGame(g.id);
+        }
       })),
       compendiumList: (s.chars || []).flatMap(ch => (ch.companions || []).map((comp, i) => {
         this.normalizeCompanion(comp);
@@ -1222,6 +1236,8 @@ class Component extends DCLogic {
       creatures: data.creatures, importedDomainCards: data.importedDomainCards, sessionElapsed: data.sessionElapsed,
       skipAuth, pendingJoinId
     });
+    this._onSaveFailed = () => this.setState({ saveFailed: true });
+    window.addEventListener('dh-save-failed', this._onSaveFailed);
     this._timerInterval = setInterval(() => {
       if (this.state.sessionRunning) {
         const next = this.state.sessionElapsed + 1;
@@ -1242,6 +1258,7 @@ class Component extends DCLogic {
   }
 
   componentWillUnmount() {
+    if (this._onSaveFailed) window.removeEventListener('dh-save-failed', this._onSaveFailed);
     if (this._timerInterval) clearInterval(this._timerInterval);
   }
 }

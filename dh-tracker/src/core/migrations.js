@@ -128,17 +128,18 @@ export const migrationsMixin = {
     // weaponsPrimary/weaponsSecondary lists — then drop `weapons` entirely so
     // it can't keep sitting there as stale ghost data (e.g. still showing
     // "Dagger" forever) once the real lists have moved on without it.
-    if (!c.weaponsPrimary || !c.weaponsSecondary) {
-      const legacy = c.weapons || this.defaultWeapons();
-      if (!c.weaponsPrimary) {
-        c.weaponsPrimary = (legacy.primary && legacy.primary.name)
-          ? [{ name: legacy.primary.name, range: legacy.primary.range || 'Melee', damage: legacy.primary.damage || '', equipped: true, features: [] }]
-          : [];
+    if (!c.weaponsPrimary) c.weaponsPrimary = [];
+    if (!c.weaponsSecondary) c.weaponsSecondary = [];
+    // Only carry the legacy pick over into a list that is still empty, so
+    // characters saved by the creation wizard (which used to write `weapons`)
+    // keep their weapon.
+    const legacy = c.weapons;
+    if (legacy) {
+      if (!c.weaponsPrimary.length && legacy.primary && legacy.primary.name) {
+        c.weaponsPrimary.push({ name: legacy.primary.name, range: legacy.primary.range || 'Melee', damage: legacy.primary.damage || '', equipped: true, features: [] });
       }
-      if (!c.weaponsSecondary) {
-        c.weaponsSecondary = (legacy.secondaryEnabled && legacy.secondary && legacy.secondary.name)
-          ? [{ name: legacy.secondary.name, range: legacy.secondary.range || 'Melee', damage: legacy.secondary.damage || '', equipped: true, features: [] }]
-          : [];
+      if (!c.weaponsSecondary.length && legacy.secondaryEnabled && legacy.secondary && legacy.secondary.name) {
+        c.weaponsSecondary.push({ name: legacy.secondary.name, range: legacy.secondary.range || 'Melee', damage: legacy.secondary.damage || '', equipped: true, features: [] });
       }
     }
     delete c.weapons;
@@ -161,6 +162,14 @@ export const migrationsMixin = {
     if (!c.levelLog) c.levelLog = [];
     if (typeof c.inventory !== 'string') c.inventory = '';
     if (typeof c.notes !== 'string') c.notes = '';
+    // Any other top-level field a hand-edited, imported or very old character
+    // is missing (stress, hope, armor, thresholds, domains, level, ...) gets
+    // the same default a brand-new character has, so rendering never has to
+    // dereference undefined.
+    const blank = this.blankChar();
+    Object.keys(blank).forEach(k => {
+      if (c[k] === undefined) c[k] = JSON.parse(JSON.stringify(blank[k]));
+    });
     return c;
   },
 

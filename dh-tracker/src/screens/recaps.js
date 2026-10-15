@@ -44,7 +44,7 @@ export const recapsTemplate = `
           <div style="display:flex;gap:10px;align-items:baseline;flex-wrap:wrap"><span style="font-family:var(--font-body);font-size:calc(11px * var(--scale-body));letter-spacing:0.06em;text-transform:uppercase;color:var(--accent,#8C5A2B);font-weight:600">{{rc2.date}}</span><span style="font-family:var(--font-flavor);font-size:calc(18px * var(--scale-flavor));font-weight:600">{{rc2.title}}</span></div>
           <button sc-camel-on-click="{{rc2.remove}}" style="border:none;background:none;color:var(--muted);cursor:pointer;font-size:14px;padding:2px" style-hover="color:#A33B3B">✕</button>
         </div>
-        <div style="font-family:var(--font-body);font-size:calc(13.5px * var(--scale-body-recap));color:var(--text);line-height:1.55;margin-top:8px;opacity:0.85">{{rc2.text}}</div>
+        <div style="font-family:var(--font-body);font-size:calc(13.5px * var(--scale-body-recap));color:var(--text);line-height:1.55;margin-top:8px;opacity:0.85;white-space:pre-wrap">{{rc2.text}}</div>
       </div>
     </sc-for>
   </div>

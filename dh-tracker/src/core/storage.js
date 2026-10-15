@@ -8,7 +8,10 @@ export function loadJSON(key) {
   try { return JSON.parse(localStorage.getItem(key)); } catch (e) { return null; }
 }
 export function saveJSON(key, value) {
-  try { localStorage.setItem(key, JSON.stringify(value)); } catch (e) {}
+  try { localStorage.setItem(key, JSON.stringify(value)); return true; } catch (e) {
+    try { window.dispatchEvent(new Event('dh-save-failed')); } catch (er) {}
+    return false;
+  }
 }
 export function loadRaw(key) {
   try { return localStorage.getItem(key); } catch (e) { return null; }

@@ -27,6 +27,7 @@ body{margin:0;background:#f2efe9;color:#26221b;font-family:system-ui,-apple-syst
 a{color:#8C5A2B}a:hover{color:#6e4520}
 input,select,textarea,button{font-family:inherit;color:var(--text,#26221b)}
 ::placeholder{color:#b3ab9d}
+@media (hover:none) and (pointer:coarse){input,select,textarea{font-size:16px !important}}
 @page{size:letter;margin:0.5in}
 @media print{
   [data-print-hide]{display:none !important}

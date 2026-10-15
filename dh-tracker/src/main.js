@@ -282,7 +282,7 @@ class Component extends DCLogic {
         if (firstComp && !firstComp.portraitKey) firstComp.portraitKey = 'comp-' + Math.random().toString(36).slice(2, 9);
         return {
           name: ch.name,
-          sub: 'Level ' + ch.level + ' ' + [ch.ancestry, ch.klass].filter(Boolean).join(' ') + (ch.subclass ? ' · ' + ch.subclass : ''),
+          sub: 'Level ' + ch.level + ' ' + [this.ancestryLabel(ch), ch.klass].filter(Boolean).join(' ') + (ch.subclass ? ' · ' + ch.subclass : ''),
           level: ch.level,
           hpTxt: (ch.hp.max - ch.hp.marked) + '/' + ch.hp.max,
           hpPct: Math.round(100 * (ch.hp.max - ch.hp.marked) / ch.hp.max) + '%',
@@ -378,6 +378,10 @@ class Component extends DCLogic {
       vals.wizMultiHasSubclasses = vals.wizMultiSubclassOptions.length > 0;
       vals.wizAncestry = w.ancestry;
       vals.wizSetAncestry = e => this.upWizard(x => { x.ancestry = e.target.value; });
+      vals.wizMixed = !!w.mixedAncestry;
+      vals.wizToggleMixed = () => this.upWizard(x => { x.mixedAncestry = !x.mixedAncestry; if (!x.mixedAncestry) x.ancestry2 = ''; });
+      vals.wizAncestry2 = w.ancestry2;
+      vals.wizSetAncestry2 = e => this.upWizard(x => { x.ancestry2 = e.target.value; });
       vals.wizCommunity = w.community;
       vals.wizSetCommunity = e => this.upWizard(x => { x.community = e.target.value; });
       const traitOrder = ['Agility', 'Strength', 'Finesse', 'Instinct', 'Presence', 'Knowledge'];
@@ -456,7 +460,7 @@ class Component extends DCLogic {
       vals.wizSetConnections = e => this.upWizard(x => { x.connections = e.target.value; });
       vals.wizReviewName = w.name || 'Unnamed';
       vals.wizReviewLevelLine = 'Level ' + (w.level || 1);
-      vals.wizReviewLine2 = [w.ancestry, w.community].filter(Boolean).join(' · ') || '—';
+      vals.wizReviewLine2 = [this.ancestryLabel({ ancestry: w.ancestry, ancestry2: w.mixedAncestry ? w.ancestry2 : null }), w.community].filter(Boolean).join(' · ') || '—';
       vals.wizReviewLine3 = [w.klass, w.subclass].filter(Boolean).join(' — ') || '—';
       vals.wizReviewLine3b = (w.multiclassEnabled && w.multiKlass) ? ('Multiclass: ' + [w.multiKlass, w.multiSubclass].filter(Boolean).join(' — ')) : '';
       vals.wizHasMultiReview = !!vals.wizReviewLine3b;
@@ -468,7 +472,7 @@ class Component extends DCLogic {
       vals.wizIsStep = stepNames.map((_, i) => i === w.step);
       vals.wizCanNext = w.step === 1 ? !!w.klass
         : (w.step === 2 ? (!w.multiclassEnabled || !!w.multiKlass)
-        : (w.step === 3 ? (!!w.ancestry && !!w.community) : true));
+        : (w.step === 3 ? (!!w.ancestry && !!w.community && (!w.mixedAncestry || !!w.ancestry2)) : true));
       vals.wizIsFirst = w.step === 0;
       vals.wizIsNotFirst = w.step !== 0;
       vals.wizIsLast = w.step === stepNames.length - 1;
@@ -497,9 +501,11 @@ class Component extends DCLogic {
 
     // ---- sheet-level values ----
     vals.c = c;
-    vals.headerSub = [c.pronouns, [c.ancestry, c.community].filter(Boolean).join(' · '), c.klass + (c.subclass ? ' (' + c.subclass + ')' : ''), c.domains.join(' & ')].filter(Boolean).join('  ·  ');
+    vals.headerSub = [c.pronouns, [this.ancestryLabel(c), c.community].filter(Boolean).join(' · '), c.klass + (c.subclass ? ' (' + c.subclass + ')' : ''), c.domains.join(' & ')].filter(Boolean).join('  ·  ');
     vals.isMulticlass = !!c.multiclass;
     vals.multiclassLabel = c.multiclass ? c.multiclass.klass + (c.multiclass.subclass ? ' (' + c.multiclass.subclass + ')' : '') : '';
+    vals.isMixedAncestry = c.ancestry2 != null;
+    vals.toggleMixedAncestry = () => this.up(ch => { ch.ancestry2 = ch.ancestry2 == null ? '' : null; });
     vals.toggleMulticlass = () => this.up(ch => { ch.multiclass = ch.multiclass ? null : { klass: '', subclass: '' }; });
 
     this.normalizeChar(c);
@@ -837,6 +843,15 @@ class Component extends DCLogic {
       featuresTxt: (w.features || []).map(f => f.name + (f.desc ? ': ' + f.desc : '')).join(' · ')
     }));
     vals.playArmorSummary = (c.equippedArmor.name || 'No armor') + ' · score ' + c.equippedArmor.score;
+    const armorFeats = c.equippedArmor.features || [];
+    vals.hasArmorFeatures = armorFeats.length > 0;
+    vals.armorFeaturesTxt = armorFeats.map(f => f.name + (f.desc ? ': ' + f.desc : '')).join(' · ');
+    vals.armorFeatures = armorFeats.map((f, j) => ({
+      name: { val: f.name, on: e => this.up(ch => { ch.equippedArmor.features[j].name = e.target.value; }) },
+      desc: { val: f.desc, on: e => this.up(ch => { ch.equippedArmor.features[j].desc = e.target.value; }) },
+      remove: () => this.up(ch => ch.equippedArmor.features.splice(j, 1))
+    }));
+    vals.addArmorFeature = () => this.up(ch => ch.equippedArmor.features.push({ name: '', desc: '' }));
 
     // ---- short rest moves (Play tab) ----
     vals.shortRestMoves = c.shortRest.moves.map((m, i) => ({
@@ -1128,7 +1143,7 @@ class Component extends DCLogic {
       name: this.bind('name'), pronouns: this.bind('pronouns'), backstory: this.bind('backstory'),
       klass: this.bind('klass'), subclass: this.bind('subclass'),
       klass2: this.bind('multiclass.klass'), subclass2: this.bind('multiclass.subclass'),
-      ancestry: this.bind('ancestry'), community: this.bind('community'),
+      ancestry: this.bind('ancestry'), ancestry2: this.bind('ancestry2'), community: this.bind('community'),
       level: this.bind('level', true), evasion: this.bind('evasion', true),
       armorScore: this.bind('armorScore', true), proficiency: this.bind('proficiency', true),
       thrMajor: this.bind('thresholds.major', true), thrSevere: this.bind('thresholds.severe', true),

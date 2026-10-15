@@ -242,6 +242,11 @@ export const compendiumMixin = {
       'Aetheris', 'Earthkin', 'Emberkin', 'Skykin', 'Tidekin', 'Gnome'];
   },
 
+  // "Elf / Orc" for a mixed ancestry, plain "Elf" otherwise.
+  ancestryLabel(c) {
+    return [c.ancestry, c.ancestry2].filter(Boolean).join(' / ');
+  },
+
   communityList() {
     return ['Highborne', 'Loreborne', 'Orderborne', 'Ridgeborne', 'Seaborne', 'Slyborne', 'Underborne', 'Wanderborne', 'Wildborne',
       // The Void

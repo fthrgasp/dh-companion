@@ -282,6 +282,9 @@ export const sheetTemplate = `
           <div style="font-size:13px;color:var(--muted);margin-bottom:8px">No weapon equipped.</div>
         </sc-if>
         <div style="font-size:12.5px;color:var(--muted)">{{playArmorSummary}}</div>
+        <sc-if value="{{hasArmorFeatures}}" hint-placeholder-val="{{ false }}">
+          <div style="font-size:11.5px;color:var(--muted);margin-top:4px;font-style:italic">{{armorFeaturesTxt}}</div>
+        </sc-if>
         <div style="font-size:11.5px;color:var(--muted);margin-top:8px;font-style:italic" data-print-hide="1">Edit these on the Gear tab.</div>
       </div>
       <div style="background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:18px 20px">
@@ -573,6 +576,17 @@ CARD: ...</pre>
           <div style="flex:none;width:100px">
             <input type="number" value="{{armorScoreVal.val}}" sc-camel-on-change="{{armorScoreVal.on}}" style="width:100%;box-sizing:border-box;border:1px solid var(--border2);border-radius:8px;padding:8px 10px;font-size:13.5px;background:var(--input-bg)">
           </div>
+        </div>
+        <div style="margin-top:10px">
+          <div style="font-size:10px;letter-spacing:0.06em;text-transform:uppercase;color:var(--muted);margin-bottom:4px">Features</div>
+          <sc-for list="{{armorFeatures}}" as="af" hint-placeholder-count="1">
+            <div style="display:flex;gap:6px;margin-bottom:5px">
+              <input value="{{af.name.val}}" sc-camel-on-change="{{af.name.on}}" placeholder="Feature" style="flex:1;min-width:90px;border:1px solid var(--border2);border-radius:7px;padding:6px 8px;font-size:12.5px;background:var(--input-bg)">
+              <input value="{{af.desc.val}}" sc-camel-on-change="{{af.desc.on}}" placeholder="What it does" style="flex:2;min-width:120px;border:1px solid var(--border2);border-radius:7px;padding:6px 8px;font-size:12.5px;background:var(--input-bg)">
+              <button sc-camel-on-click="{{af.remove}}" style="border:none;background:none;color:#b3ab9d;cursor:pointer;font-size:12px;padding:2px" style-hover="color:#A33B3B">✕</button>
+            </div>
+          </sc-for>
+          <button sc-camel-on-click="{{addArmorFeature}}" style="border:1px dashed var(--border2);background:none;color:var(--muted);border-radius:7px;padding:5px 10px;font-size:11.5px;cursor:pointer" style-hover="border-color:var(--accent,#8C5A2B);color:var(--accent,#8C5A2B)">+ Add feature</button>
         </div>
         <div style="font-size:11.5px;color:var(--muted);margin-top:6px">Armor score also drives the Play tab &amp; Edit tab defense stats.</div>
       </div>
@@ -1030,6 +1044,12 @@ CARD: ...</pre>
         <div style="flex:1;min-width:130px"><div style="font-size:11px;color:var(--muted);margin-bottom:4px">Community</div><input value="{{ed.community.val}}" sc-camel-on-change="{{ed.community.on}}" style="width:100%;box-sizing:border-box;border:1px solid var(--border2);border-radius:8px;padding:8px 10px;font-size:14px;background:var(--input-bg)"></div>
         <div style="flex:none;width:80px"><div style="font-size:11px;color:var(--muted);margin-bottom:4px">Level</div><input type="number" value="{{ed.level.val}}" sc-camel-on-change="{{ed.level.on}}" style="width:100%;box-sizing:border-box;border:1px solid var(--border2);border-radius:8px;padding:8px 10px;font-size:14px;background:var(--input-bg)"></div>
       </div>
+      <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;padding-top:2px"><input type="checkbox" checked="{{isMixedAncestry}}" sc-camel-on-change="{{toggleMixedAncestry}}">Mixed ancestry — one feature from each of two ancestries</label>
+      <sc-if value="{{isMixedAncestry}}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <div style="flex:1;min-width:130px"><div style="font-size:11px;color:var(--muted);margin-bottom:4px">Second ancestry</div><input value="{{ed.ancestry2.val}}" sc-camel-on-change="{{ed.ancestry2.on}}" list="ancestry-options" style="width:100%;box-sizing:border-box;border:1px solid var(--border2);border-radius:8px;padding:8px 10px;font-size:14px;background:var(--input-bg)"></div>
+        </div>
+      </sc-if>
       <div style="border-top:1px dashed var(--border2);padding-top:12px">
         <div style="font-size:11px;color:var(--muted);margin-bottom:8px">Homebrew ancestries</div>
         <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px">

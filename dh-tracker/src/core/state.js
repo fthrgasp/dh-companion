@@ -1,6 +1,6 @@
 import { loadJSON, saveJSON, loadRaw, saveRaw } from './storage.js';
 
-export const APP_VERSION = '0.12.6';
+export const APP_VERSION = '0.13.0';
 
 export const initialState = {
   screen: 'roster', activeId: null, tab: 'play',

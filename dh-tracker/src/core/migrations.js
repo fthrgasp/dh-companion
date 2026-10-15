@@ -99,7 +99,7 @@ export const migrationsMixin = {
 
   blankChar() {
     return {
-      id: 'c' + Date.now(), name: 'New Adventurer', pronouns: '', ancestry: '', community: '',
+      id: 'c' + Date.now(), name: 'New Adventurer', pronouns: '', ancestry: '', ancestry2: null, community: '',
       klass: '', subclass: '', multiclass: null, level: 1, proficiency: 1, domains: [], evasion: 10, armorScore: 3,
       traits: { Agility: 0, Strength: 0, Finesse: 0, Instinct: 0, Presence: 0, Knowledge: 0 },
       hp: { max: 6, marked: 0 }, stress: { max: 6, marked: 0 }, hope: { max: 6, marked: 2 }, armor: { max: 3, marked: 0 },
@@ -111,7 +111,7 @@ export const migrationsMixin = {
       conditions: this.defaultConditions(),
       shortRest: { moves: this.defaultShortRestMoves() },
       weaponsPrimary: [], weaponsSecondary: [],
-      equippedArmor: { name: '', score: 3 }
+      equippedArmor: { name: '', score: 3, features: [] }
     };
   },
 
@@ -143,6 +143,9 @@ export const migrationsMixin = {
     }
     delete c.weapons;
     if (!c.equippedArmor) c.equippedArmor = { name: '', score: c.armorScore || 3 };
+    if (!c.equippedArmor.features) c.equippedArmor.features = [];
+    // null = single ancestry; a string (even '') = mixed ancestry (two ancestries, one feature from each).
+    if (c.ancestry2 === undefined) c.ancestry2 = null;
     if (!c.companions) { c.companions = c.companion ? [c.companion] : []; c.activeCompanion = 0; }
     if (c.activeCompanion == null) c.activeCompanion = 0;
     if (c.activeCompanion >= c.companions.length) c.activeCompanion = Math.max(0, c.companions.length - 1);

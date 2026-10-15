@@ -2,6 +2,12 @@
 
 All notable changes to the Daggerheart Tracker are logged here. Format loosely follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [0.13.0] — 2026-10-14
+
+### Added
+- **Mixed ancestry.** Daggerheart lets you build a mixed-ancestry character by taking one ancestry feature from each of two ancestries. The guided-creation Ancestry step and the Edit tab both have a "Mixed ancestry" checkbox that reveals a second-ancestry field; the sheet header, roster card, and wizard review show it as "Elf / Orc". In the wizard, Next stays blocked until the second ancestry is picked. Stored as `ancestry2` (`null` = single ancestry), backfilled on old characters.
+- **Armor features.** The Gear tab's Armor panel now has the same name/description Features list that weapons have, and equipped-armor features show on the Play tab under the armor line. Stored as `equippedArmor.features`, backfilled on old characters.
+
 ## [0.12.6] — 2026-09-27
 
 ### Fixed

@@ -14,7 +14,7 @@ export const characterWizardMixin = {
   newWizard() {
     const wp = this.weaponPresets()[0], ap = this.armorPresets()[0];
     return {
-      step: 0, id: 'c' + Date.now(), name: '', pronouns: '', klass: '', subclass: '', ancestry: '', community: '', level: 1, levelHigherOpen: false,
+      step: 0, id: 'c' + Date.now(), name: '', pronouns: '', klass: '', subclass: '', ancestry: '', mixedAncestry: false, ancestry2: '', community: '', level: 1, levelHigherOpen: false,
       multiclassEnabled: false, multiKlass: '', multiSubclass: '',
       traits: this.rollTraitArray(), traitsRerolled: false,
       domainCards: [{ name: '', text: '' }, { name: '', text: '' }],
@@ -75,7 +75,7 @@ export const characterWizardMixin = {
     const char = Object.assign({}, base, {
       id: w.id,
       name: w.name.trim() || 'New Adventurer',
-      pronouns: w.pronouns, ancestry: w.ancestry, community: w.community,
+      pronouns: w.pronouns, ancestry: w.ancestry, ancestry2: w.mixedAncestry ? w.ancestry2 : null, community: w.community,
       klass: w.klass, subclass: w.subclass, domains: cd.domains.slice(),
       multiclass: (w.multiclassEnabled && w.multiKlass) ? { klass: w.multiKlass, subclass: w.multiSubclass } : null,
       level, proficiency: scale.proficiency,
@@ -84,7 +84,7 @@ export const characterWizardMixin = {
       armor: { max: w.armorScore, marked: 0 }, thresholds: scale.thresholds,
       cards, experiences, backstory, inventory: w.inventoryText,
       weapons: { primary: { name: w.weaponName, range: w.weaponRange, damage: w.weaponDamage }, secondaryEnabled: false, secondary: { name: '', range: 'Melee', damage: '' } },
-      equippedArmor: { name: w.armorName, score: w.armorScore }, armorScore: w.armorScore,
+      equippedArmor: { name: w.armorName, score: w.armorScore, features: [] }, armorScore: w.armorScore,
       companions, activeCompanion: 0
     });
     this.upAll(chars => chars.push(char));
@@ -174,6 +174,15 @@ export const wizardTemplate = `
               <sc-for list="{{wizAncestryOptions}}" as="ao" hint-placeholder-count="18"><option value="{{ao}}">{{ao}}</option></sc-for>
             </sc-raw-select>
           </div>
+          <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer"><input type="checkbox" checked="{{wizMixed}}" sc-camel-on-change="{{wizToggleMixed}}">Mixed ancestry — one feature from each of two ancestries</label>
+          <sc-if value="{{wizMixed}}" hint-placeholder-val="{{ false }}">
+            <div><div style="font-size:11px;color:var(--muted);margin-bottom:4px">Second ancestry</div>
+              <sc-raw-select value="{{wizAncestry2}}" sc-camel-on-change="{{wizSetAncestry2}}" style="width:100%;border:1px solid var(--border2);border-radius:8px;padding:9px 12px;font-size:14px;background:var(--input-bg)">
+                <option value="">Choose a second ancestry…</option>
+                <sc-for list="{{wizAncestryOptions}}" as="ao2" hint-placeholder-count="18"><option value="{{ao2}}">{{ao2}}</option></sc-for>
+              </sc-raw-select>
+            </div>
+          </sc-if>
           <div><div style="font-size:11px;color:var(--muted);margin-bottom:4px">Community</div>
             <sc-raw-select value="{{wizCommunity}}" sc-camel-on-change="{{wizSetCommunity}}" style="width:100%;border:1px solid var(--border2);border-radius:8px;padding:9px 12px;font-size:14px;background:var(--input-bg)">
               <option value="">Choose a community…</option>

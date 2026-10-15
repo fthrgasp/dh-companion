@@ -274,7 +274,7 @@ export const authGateTemplate = `
     <h1 style="font-family:var(--font-flavor);font-weight:600;font-size:calc(24px * var(--scale-flavor));margin:0 0 6px">Sign in</h1>
     <p style="font-size:13px;color:var(--muted);margin:0 0 20px">Sign in to sync your characters across devices. We'll email you a sign-in code and link — no password needed.</p>
     <sc-if value="{{authMagicLinkSent}}" hint-placeholder-val="{{ false }}">
-      <p style="font-size:13.5px;color:var(--text);margin:0 0 12px">Check your email. Type the code below to sign in right here, or tap the link in the email (the link opens in Safari, so use the code if you're on a home-screen app).</p>
+      <p style="font-size:13.5px;color:var(--text);margin:0 0 12px">We sent a code to <strong>{{authEmail}}</strong>. Type the code below to sign in right here, or tap the link in the email (the link opens in Safari, so use the code if you're on a home-screen app).</p>
       <input type="text" inputmode="numeric" autocomplete="one-time-code" value="{{authCode}}" sc-camel-on-change="{{setAuthCode}}" placeholder="Code from the email" style="width:100%;box-sizing:border-box;border:1px solid var(--border2);border-radius:8px;padding:10px 12px;font-size:18px;letter-spacing:0.15em;text-align:center;background:var(--input-bg);margin-bottom:10px">
       <sc-if value="{{authErrorOpen}}" hint-placeholder-val="{{ false }}">
         <p style="font-size:12.5px;color:#A33B3B;margin:0 0 10px">{{authErrorText}}</p>
@@ -283,7 +283,7 @@ export const authGateTemplate = `
       <button sc-camel-on-click="{{restartSignIn}}" style="width:100%;border:none;background:none;color:var(--muted);padding:10px 0 0;font-size:12.5px;cursor:pointer;text-decoration:underline">Use a different email / send a new code</button>
     </sc-if>
     <sc-if value="{{authFormOpen}}" hint-placeholder-val="{{ true }}">
-      <input type="email" value="{{authEmail}}" sc-camel-on-change="{{setAuthEmail}}" placeholder="you@example.com" style="width:100%;box-sizing:border-box;border:1px solid var(--border2);border-radius:8px;padding:10px 12px;font-size:14px;background:var(--input-bg);margin-bottom:10px">
+      <input type="email" autocapitalize="none" autocorrect="off" spellcheck="false" autocomplete="email" value="{{authEmail}}" sc-camel-on-change="{{setAuthEmail}}" placeholder="you@example.com" style="width:100%;box-sizing:border-box;border:1px solid var(--border2);border-radius:8px;padding:10px 12px;font-size:14px;background:var(--input-bg);margin-bottom:10px">
       <sc-if value="{{authErrorOpen}}" hint-placeholder-val="{{ false }}">
         <p style="font-size:12.5px;color:#A33B3B;margin:0 0 10px">{{authErrorText}}</p>
       </sc-if>

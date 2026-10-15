@@ -2,6 +2,11 @@
 
 All notable changes to the Daggerheart Tracker are logged here. Format loosely follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [0.13.2] — 2026-10-14
+
+### Changed
+- **Sign-in shows which address the code was sent to**, and the email field turns off iOS autocorrect/auto-capitalization. A mistyped address (e.g. `bisa7@` for `brisa7@`) used to look like "the email never came" because Supabase happily creates an account and emails whatever address it is given.
+
 ## [0.13.1] — 2026-10-14
 
 ### Added
